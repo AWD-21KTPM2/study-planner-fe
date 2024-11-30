@@ -1,5 +1,4 @@
-import { LockOutlined, UserOutlined } from '@ant-design/icons'
-import { Button, Card, Checkbox, Form, Input, message } from 'antd'
+import { Button, Form, Input, message } from 'antd'
 import Link from 'antd/es/typography/Link'
 import axios from 'axios'
 import React, { useState } from 'react'
@@ -12,7 +11,7 @@ import { LoginResponse, UserDTO } from '@/types/user.type'
 const Login: React.FC = () => {
   const navigate = useNavigate()
   const { setAuthSession } = useAuth()
-  const [loading, setLoading] = useState<boolean>(false)
+  const [_loading, setLoading] = useState<boolean>(false)
 
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
