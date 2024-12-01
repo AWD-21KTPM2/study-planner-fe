@@ -13,13 +13,33 @@ const Login: React.FC = () => {
   const { setAuthSession } = useAuth()
   const [_loading, setLoading] = useState<boolean>(false)
 
+  // const onFinish = async (data: UserDTO): Promise<void> => {
+  //   try {
+  //     const response = await axios.post<LoginResponse>(`${import.meta.env.VITE_API_URL}/user/login`, data)
+
+  //     const { token, id, email } = response.data.data
+
+  //     setAuthSession(token, { id, email }) // Store the JWT token
+  //     message.success(response.data.message)
+  //     navigate(ROUTE.HOME)
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error) && error.response) {
+  //       message.error(error.response.data.message)
+  //     } else {
+  //       message.error('An unexpected error occurred')
+  //     }
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
       const response = await axios.post<LoginResponse>(`${import.meta.env.VITE_API_URL}/user/login`, data)
 
-      const { token, id, email } = response.data.data
+      const { accessToken, id, email } = response.data.data
 
-      setAuthSession(token, { id, email }) // Store the JWT token
+      setAuthSession(accessToken, { id, email })
       message.success(response.data.message)
       navigate(ROUTE.HOME)
     } catch (error) {
