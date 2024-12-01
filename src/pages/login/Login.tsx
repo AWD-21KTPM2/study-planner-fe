@@ -34,39 +34,57 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div style={{ width: 400, margin: 'auto', padding: '50px' }}>
-      <h2>Login</h2>
-      <Form layout='vertical' onFinish={onFinish}>
-        <Form.Item
-          label='Email'
-          name='email'
-          rules={[
-            { required: true, message: 'Email is required' },
-            { type: 'email', message: 'Enter a valid email' }
-          ]}
-        >
-          <Input placeholder='Enter your email' />
-        </Form.Item>
+    <div className='flex items-center justify-center min-h-screen bg-gray-100'>
+      <div className='w-full max-w-md p-6 bg-white rounded-lg shadow-lg'>
+        <h2 className='mb-6 text-2xl font-semibold text-center text-gray-800'>Login</h2>
+        <Form layout='vertical' onFinish={onFinish} className='space-y-4'>
+          <Form.Item
+            label='Email'
+            name='email'
+            rules={[
+              { required: true, message: 'Email is required' },
+              { type: 'email', message: 'Enter a valid email' }
+            ]}
+          >
+            <Input
+              placeholder='Enter your email'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </Form.Item>
 
-        <Form.Item
-          label='Password'
-          name='password'
-          rules={[
-            { required: true, message: 'Password is required' },
-            { min: 6, message: 'Password must be at least 6 characters' }
-          ]}
-        >
-          <Input.Password placeholder='Enter your password' />
-        </Form.Item>
+          <Form.Item
+            label='Password'
+            name='password'
+            rules={[
+              { required: true, message: 'Password is required' },
+              { min: 6, message: 'Password must be at least 6 characters' }
+            ]}
+          >
+            <Input.Password
+              placeholder='Enter your password'
+              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type='primary' htmlType='submit' block>
-            Login
-          </Button>
-        </Form.Item>
+          <Form.Item>
+            <Button
+              type='primary'
+              htmlType='submit'
+              block
+              className='w-full py-2 text-white bg-blue-500 hover:bg-blue-600'
+            >
+              Login
+            </Button>
+          </Form.Item>
 
-        <Link href='/register'>Register</Link>
-      </Form>
+          <div className='text-center'>
+            <span className='text-gray-600'>Don&apos;t have an account? </span>
+            <Link href='/register' className='text-blue-500 hover:underline'>
+              Register
+            </Link>
+          </div>
+        </Form>
+      </div>
     </div>
   )
 }
