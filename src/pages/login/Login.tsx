@@ -1,5 +1,5 @@
 import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
-import { Button, Form, Input, message } from 'antd'
+import { Button, Form, Input, message, Spin } from 'antd'
 import Link from 'antd/es/typography/Link'
 import axios from 'axios'
 import React, { useState } from 'react'
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
 import { LoginResponse, UserDTO } from '@/types/user.type'
+import { axiosClient } from '@/utils/axios-client.util'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
@@ -15,8 +16,8 @@ const Login: React.FC = () => {
   const [_loading, setLoading] = useState<boolean>(false)
 
   const onGoogleSuccess = (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>): void => {
-    axios
-      .post<LoginResponse>(`${import.meta.env.VITE_API_URL}/user/google-login`, { token: response.access_token })
+    axiosClient
+      .post<LoginResponse>(`user/google-login`, { token: response.access_token })
       .then((response) => {
         const { accessToken, id, email } = response.data.data
 
@@ -46,7 +47,8 @@ const Login: React.FC = () => {
 
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
-      const response = await axios.post<LoginResponse>(`${import.meta.env.VITE_API_URL}/user/login`, data)
+      setLoading(true)
+      const response = await axiosClient.post<LoginResponse>(`user/login`, data)
 
       const { accessToken, id, email } = response.data.data
 
@@ -66,6 +68,7 @@ const Login: React.FC = () => {
 
   return (
     <div className='flex justify-center items-center bg-gray-100 min-h-screen'>
+      <Spin spinning={_loading} size='large' fullscreen />
       <div className='bg-white shadow-lg p-6 rounded-lg w-full max-w-md'>
         <h2 className='mb-6 font-semibold text-2xl text-center text-gray-800'>Login</h2>
         <Form layout='vertical' onFinish={onFinish} className='space-y-4'>
