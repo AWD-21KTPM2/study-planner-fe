@@ -1,3 +1,4 @@
+import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
 import { Button, Form, Input, message } from 'antd'
 import Link from 'antd/es/typography/Link'
 import axios from 'axios'
@@ -12,6 +13,36 @@ const Login: React.FC = () => {
   const navigate = useNavigate()
   const { setAuthSession } = useAuth()
   const [_loading, setLoading] = useState<boolean>(false)
+
+  const onGoogleSuccess = (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>): void => {
+    axios
+      .post<LoginResponse>(`${import.meta.env.VITE_API_URL}/user/google-login`, { token: response.access_token })
+      .then((response) => {
+        const { accessToken, id, email } = response.data.data
+
+        setAuthSession(accessToken, { id, email })
+        message.success(response.data.message)
+        navigate(ROUTE.HOME)
+      })
+      .catch((error) => {
+        if (axios.isAxiosError(error) && error.response) {
+          message.error(error.response.data.message)
+        } else {
+          message.error('An unexpected error occurred')
+        }
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
+  const loginByGoogle = useGoogleLogin({
+    onSuccess: onGoogleSuccess,
+    onError: (error) => {
+      console.error('Google login error:', error)
+      message.error('An unexpected error occurred')
+    }
+  })
 
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
@@ -34,9 +65,9 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className='flex items-center justify-center min-h-screen bg-gray-100'>
-      <div className='w-full max-w-md p-6 bg-white rounded-lg shadow-lg'>
-        <h2 className='mb-6 text-2xl font-semibold text-center text-gray-800'>Login</h2>
+    <div className='flex justify-center items-center bg-gray-100 min-h-screen'>
+      <div className='bg-white shadow-lg p-6 rounded-lg w-full max-w-md'>
+        <h2 className='mb-6 font-semibold text-2xl text-center text-gray-800'>Login</h2>
         <Form layout='vertical' onFinish={onFinish} className='space-y-4'>
           <Form.Item
             label='Email'
@@ -48,7 +79,7 @@ const Login: React.FC = () => {
           >
             <Input
               placeholder='Enter your email'
-              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='px-4 py-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </Form.Item>
 
@@ -62,7 +93,7 @@ const Login: React.FC = () => {
           >
             <Input.Password
               placeholder='Enter your password'
-              className='w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='px-4 py-2 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </Form.Item>
 
@@ -71,9 +102,19 @@ const Login: React.FC = () => {
               type='primary'
               htmlType='submit'
               block
-              className='w-full py-2 text-white bg-blue-500 hover:bg-blue-600'
+              className='bg-blue-500 hover:bg-blue-600 py-2 w-full text-white'
             >
               Login
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button
+              type='primary'
+              block
+              className='bg-red-500 hover:!bg-red-600 py-2 hover:border-none hover:!ring-red-600 w-full text-white'
+              onClick={() => loginByGoogle()}
+            >
+              Login with Google
             </Button>
           </Form.Item>
 
