@@ -1,6 +1,11 @@
 import '@/pages/home/home.scss'
 
 import {
+  BarChartOutlined,
+  BookOutlined,
+  CalendarOutlined,
+  CheckSquareOutlined,
+  ClockCircleOutlined,
   ContactsOutlined,
   HomeOutlined,
   InfoCircleOutlined,
@@ -9,92 +14,133 @@ import {
   TeamOutlined,
   UserOutlined
 } from '@ant-design/icons'
-import { Avatar, Button, Card, Col, Dropdown, Layout, Menu, Row, Typography } from 'antd'
+import { Avatar, Button, Card, Col, Dropdown, Layout, Menu, MenuProps, Row, Tag } from 'antd'
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
 
-const { Header, Content, Footer } = Layout
-const { Title, Paragraph } = Typography
+import ActionCard from './ActionCard'
+
+const { Header, Content } = Layout
+
+const menuList = [
+  { title: 'Home', icon: <HomeOutlined />, path: ROUTE.HOME },
+  { title: 'About', icon: <InfoCircleOutlined />, path: ROUTE.NOT_FOUND },
+  { title: 'Services', icon: <TeamOutlined />, path: ROUTE.NOT_FOUND },
+  { title: 'Contact', icon: <ContactsOutlined />, path: ROUTE.NOT_FOUND }
+]
 
 const Home = (): React.ReactNode => {
   const { clearAuthSession } = useAuth()
   const navigate = useNavigate()
 
-  const profileMenu = (
-    <Menu>
-      <Menu.Item key='1' icon={<UserOutlined />} onClick={() => navigate(ROUTE.PROFILE)}>
-        Profile
-      </Menu.Item>
-      <Menu.Item key='2' icon={<SettingOutlined />}>
-        Settings
-      </Menu.Item>
-      <Menu.Item key='3' icon={<LogoutOutlined />} onClick={clearAuthSession}>
-        Logout
-      </Menu.Item>
-    </Menu>
-  )
+  const profileMenu: MenuProps['items'] = [
+    {
+      key: '1',
+      icon: <UserOutlined />,
+      label: <a href={ROUTE.PROFILE}>Profile</a>
+    },
+    {
+      key: '2',
+      icon: <SettingOutlined />,
+      label: 'Settings'
+    },
+    {
+      key: '3',
+      icon: <LogoutOutlined />,
+      label: 'Logout',
+      onClick: clearAuthSession
+    }
+  ]
   return (
     <Layout className='min-h-screen'>
-      <Header className='flex items-center justify-between'>
+      <Header className='flex justify-between items-center bg-white px-4 border-b'>
         <div className='flex items-center'>
-          <div className='text-white text-2xl font-bold mr-4'>My Company</div>
-          <Menu theme='dark' mode='horizontal' defaultSelectedKeys={['1']}>
-            <Menu.Item key='1' icon={<HomeOutlined />}>
-              Home
-            </Menu.Item>
-            <Menu.Item key='2' icon={<InfoCircleOutlined />}>
-              About
-            </Menu.Item>
-            <Menu.Item key='3' icon={<TeamOutlined />}>
-              Services
-            </Menu.Item>
-            <Menu.Item key='4' icon={<ContactsOutlined />}>
-              Contact
-            </Menu.Item>
-          </Menu>
+          <BookOutlined className='text-2xl text-blue-600' />
+          <span className='ml-2 font-semibold text-xl'>Study Planner</span>
         </div>
-        <Dropdown overlay={profileMenu} placement='bottomRight' arrow>
-          <Avatar size='large' icon={<UserOutlined />} className='cursor-pointer' />
-        </Dropdown>
+        <div className='flex items-center gap-4'>
+          <Menu theme='light' mode='horizontal' defaultSelectedKeys={['1']}>
+            {menuList.map((menu, index) => (
+              <Menu.Item key={index + 1} icon={menu.icon} onClick={() => navigate(menu.path)}>
+                {menu.title}
+              </Menu.Item>
+            ))}
+          </Menu>
+          <Dropdown menu={{ items: profileMenu }} trigger={['click']}>
+            <Avatar icon={<UserOutlined />} className='bg-blue-600' />
+          </Dropdown>
+        </div>
       </Header>
 
-      <Content className='p-8'>
-        <div className='text-center mb-16'>
-          <Title>Welcome to My Company</Title>
-          <Paragraph className='text-lg mb-8'>We provide innovative solutions for your business needs.</Paragraph>
-          <Button type='primary' size='large'>
-            Learn More
-          </Button>
-        </div>
+      <Content className='bg-gray-50 p-4 md:p-6 lg:p-8'>
+        <div className='mx-auto max-w-7xl'>
+          {/* Quick Actions */}
+          <Row gutter={[16, 16]} className='mb-6'>
+            <Col xs={24} md={8}>
+              <ActionCard
+                title='Start Focus Timer'
+                description='Begin a focused session'
+                className='bg-blue-50 hover:bg-blue-200 shadow-md'
+                icon={<ClockCircleOutlined className='text-2xl text-blue-600' />}
+                action={() => {}}
+              />
+            </Col>
+            <Col xs={24} md={8}>
+              <ActionCard
+                title='Add New Task'
+                description='Create a study task'
+                className='bg-green-50 hover:bg-green-200 shadow-md'
+                icon={<CheckSquareOutlined className='text-2xl text-green-600' />}
+                action={() => {}}
+              />
+            </Col>
+            <Col xs={24} md={8}>
+              <ActionCard
+                title='View Progress'
+                description='Check your study progress'
+                className='bg-purple-50 hover:bg-purple-200 shadow-md'
+                icon={<BarChartOutlined className='text-2xl text-purple-600' />}
+                action={() => {}}
+              />
+            </Col>
+          </Row>
 
-        <Row gutter={[16, 16]} className='mb-16'>
-          {[
-            { title: 'Quality Service', content: 'We deliver top-notch services to our clients.' },
-            { title: 'Expert Team', content: 'Our team consists of industry experts and professionals.' },
-            { title: 'Innovative Solutions', content: 'We offer cutting-edge solutions for modern problems.' },
-            { title: 'Customer Satisfaction', content: 'Your satisfaction is our top priority.' }
-          ].map((feature, index) => (
-            <Col xs={24} sm={12} md={6} key={index}>
-              <Card title={feature.title} className='h-full'>
-                <p>{feature.content}</p>
+          {/* Calendar and Tasks */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={16}>
+              <Card title='Schedule' extra={<Button type='link'>Analyze Schedule</Button>}>
+                <div className='flex justify-center items-center bg-gray-100 rounded h-96'>
+                  <CalendarOutlined className='text-4xl text-gray-400' />
+                </div>
               </Card>
             </Col>
-          ))}
-        </Row>
-
-        <div className='text-center'>
-          <Title level={2}>Ready to get started?</Title>
-          <Paragraph className='mb-8'>Contact us today to learn how we can help your business grow.</Paragraph>
-          <Button type='primary' size='large'>
-            Contact Us
-          </Button>
+            <Col xs={24} lg={8}>
+              <Card title='Tasks' extra={<Button type='link'>View All</Button>}>
+                {[
+                  { title: 'Study Mathematics', time: '2 hours', priority: 'High' },
+                  { title: 'Review Notes', time: '1 hour', priority: 'Medium' },
+                  { title: 'Practice Problems', time: '1.5 hours', priority: 'Low' }
+                ].map((task, index) => (
+                  <Card key={index} size='small' className='mb-3 last:mb-0'>
+                    <div className='flex justify-between items-center'>
+                      <div>
+                        <div className='font-medium'>{task.title}</div>
+                        <div className='text-gray-500 text-sm'>{task.time} estimated</div>
+                      </div>
+                      <Tag color={task.priority === 'High' ? 'red' : task.priority === 'Medium' ? 'gold' : 'green'}>
+                        {task.priority}
+                      </Tag>
+                    </div>
+                  </Card>
+                ))}
+              </Card>
+            </Col>
+          </Row>
         </div>
       </Content>
-
-      <Footer className='text-center'>© {new Date().getFullYear()} My Company. All rights reserved.</Footer>
     </Layout>
   )
 }
