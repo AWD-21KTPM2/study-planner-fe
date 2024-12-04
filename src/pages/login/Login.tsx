@@ -7,9 +7,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
-import { LoginResponse, UserDTO } from '@/types/user.type'
 import { googleLogin, login } from '@/utils/apis/user-apis.util'
-import { axiosClient } from '@/utils/axios-client.util'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()

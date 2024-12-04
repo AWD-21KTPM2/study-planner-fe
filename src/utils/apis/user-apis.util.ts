@@ -1,4 +1,4 @@
-import { LoginResponse, UserDTO } from '@/types/user.type'
+import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
 
 import { axiosClient } from '../axios-client.util'
 
@@ -20,7 +20,7 @@ export const googleLogin = async (token: string): Promise<LoginResponse> => {
   }
 }
 
-export const getUserProfile = async (email: string): Promise<any> => {
+export const getUserProfile = async (email: string): Promise<UserInformation> => {
   try {
     const response = await axiosClient.get(`user/profile/details?email=${email}`)
     return response.data

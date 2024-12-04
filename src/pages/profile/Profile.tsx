@@ -5,9 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
-import useAuthStore, { AuthState } from '@/stores/auth.store'
 import { getUserProfile } from '@/utils/apis/user-apis.util'
-import { axiosClient } from '@/utils/axios-client.util'
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
@@ -28,7 +26,7 @@ const Profile = (): React.ReactNode => {
   const [profile, setProfile] = useState<UserProfile>()
   const [form] = Form.useForm<UserProfile>()
 
-  const onUpdateProfile = (values: UserProfile): void => {
+  const onUpdateProfile = (): void => {
     // setProfile(values)
     message.info('Will be implemented soon')
   }
