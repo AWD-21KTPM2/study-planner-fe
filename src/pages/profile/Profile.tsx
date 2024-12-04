@@ -1,10 +1,13 @@
 import { HomeOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Button, Card, Form, Input, Layout, message, Select, Typography } from 'antd'
-import React, { useState } from 'react'
+import { Avatar, Button, Card, Form, Input, Layout, message, Select, Spin, Typography } from 'antd'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
+import useAuthStore, { AuthState } from '@/stores/auth.store'
+import { getUserProfile } from '@/utils/apis/user-apis.util'
+import { axiosClient } from '@/utils/axios-client.util'
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
@@ -21,25 +24,42 @@ interface UserProfile {
 const Profile = (): React.ReactNode => {
   const { userInformation } = useAuth()
   const navigate = useNavigate()
-
-  const [profile, setProfile] = useState<UserProfile>({
-    name: 'John Doe',
-    email: userInformation?.email || '',
-    phone: '+1 234 567 8900',
-    country: 'USA',
-    bio: 'Software developer with a passion for creating user-friendly applications.'
-  })
-
+  const [loading, setLoading] = useState<boolean>(false)
+  const [profile, setProfile] = useState<UserProfile>()
   const [form] = Form.useForm<UserProfile>()
 
-  const onFinish = (values: UserProfile): void => {
-    setProfile(values)
-    message.success('Profile updated successfully!')
+  const onUpdateProfile = (values: UserProfile): void => {
+    // setProfile(values)
+    message.info('Will be implemented soon')
   }
 
+  useEffect(() => {
+    const fetchUserProfile = async (): Promise<void> => {
+      try {
+        if (!userInformation) return
+        setLoading(true)
+        const userProfile = await getUserProfile(userInformation.email)
+
+        setProfile(userProfile)
+        form.setFieldsValue(userProfile)
+      } catch (error) {
+        console.error('Error while fetching user profile:', error)
+        message.error('An unexpected error occurred')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (userInformation) {
+      fetchUserProfile()
+    } else {
+      navigate(ROUTE.LOGIN)
+    }
+  }, [userInformation])
+
   return (
-    <Layout className='min-h-screen bg-gray-100'>
-      <Header className='bg-white shadow-md flex justify-between items-center p-4'>
+    <Layout className='bg-gray-100 min-h-screen'>
+      <Header className='flex justify-between items-center bg-white shadow-md p-4'>
         <Button type='primary' icon={<HomeOutlined />} onClick={() => navigate(ROUTE.HOME)}>
           Back to Home
         </Button>
@@ -48,15 +68,16 @@ const Profile = (): React.ReactNode => {
         </Title>
       </Header>
       <Content className='p-6'>
-        <Card className='max-w-xl mx-auto shadow-lg rounded-lg overflow-hidden' bodyStyle={{ padding: '2rem' }}>
+        <Spin spinning={loading} size='large' fullscreen />
+        <Card className='shadow-lg mx-auto rounded-lg max-w-xl overflow-hidden' styles={{ body: { padding: '2rem' } }}>
           <div className='flex flex-col items-center mb-8'>
-            <Avatar size={128} icon={<UserOutlined />} className='mb-4 bg-blue-500' />
+            <Avatar size={128} icon={<UserOutlined />} className='bg-blue-500 mb-4' />
             <Title level={2} className='text-center text-gray-800'>
-              {profile.name}
+              {profile?.name}
             </Title>
-            <Text className='text-gray-500'>{profile.bio}</Text>
+            <Text className='text-gray-500'>{profile?.bio}</Text>
           </div>
-          <Form form={form} layout='vertical' initialValues={profile} onFinish={onFinish}>
+          <Form form={form} layout='vertical' initialValues={profile} onFinish={onUpdateProfile}>
             <Form.Item name='name' label='Name' rules={[{ required: true, message: 'Name is required' }]}>
               <Input prefix={<UserOutlined />} placeholder='Enter your name' disabled />
             </Form.Item>
@@ -64,6 +85,7 @@ const Profile = (): React.ReactNode => {
               name='email'
               label='Email'
               rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
+              initialValue={profile?.email}
             >
               <Input prefix={<MailOutlined />} placeholder='Enter your email' />
             </Form.Item>

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
 import { LoginResponse, UserDTO } from '@/types/user.type'
+import { googleLogin, login } from '@/utils/apis/user-apis.util'
 import { axiosClient } from '@/utils/axios-client.util'
 
 const Login: React.FC = () => {
@@ -16,13 +17,12 @@ const Login: React.FC = () => {
   const [_loading, setLoading] = useState<boolean>(false)
 
   const onGoogleSuccess = (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>): void => {
-    axiosClient
-      .post<LoginResponse>(`user/google-login`, { token: response.access_token })
+    googleLogin(response.access_token)
       .then((response) => {
-        const { accessToken, id, email } = response.data.data
+        const { accessToken, id, email } = response.data
 
         setAuthSession(accessToken, { id, email })
-        message.success(response.data.message)
+        message.success(response.message)
         navigate(ROUTE.HOME)
       })
       .catch((error) => {
@@ -48,12 +48,12 @@ const Login: React.FC = () => {
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
       setLoading(true)
-      const response = await axiosClient.post<LoginResponse>(`user/login`, data)
+      const loginResponse = await login(data)
 
-      const { accessToken, id, email } = response.data.data
+      const { accessToken, id, email } = loginResponse.data
 
       setAuthSession(accessToken, { id, email })
-      message.success(response.data.message)
+      message.success(loginResponse.message)
       navigate(ROUTE.HOME)
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
