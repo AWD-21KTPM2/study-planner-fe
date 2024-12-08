@@ -3,7 +3,6 @@ import '@/pages/home/home.scss'
 import {
   BarChartOutlined,
   BookOutlined,
-  CalendarOutlined,
   CheckSquareOutlined,
   ClockCircleOutlined,
   ContactsOutlined,
@@ -21,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
 
+import { ContinuousCalendar } from '../../components/calendar/ContinuousCalendar'
 import ActionCard from './ActionCard'
 
 const { Header, Content } = Layout
@@ -35,6 +35,25 @@ const menuList = [
 const Home = (): React.ReactNode => {
   const { clearAuthSession } = useAuth()
   const navigate = useNavigate()
+  const _monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December'
+  ]
+
+  const _onClickHandler = (_day: number, _month: number, _year: number): void => {
+    // const snackMessage = `Clicked on ${monthNames[month]} ${day}, ${year}`
+    // createSnack(snackMessage, 'success')
+  }
 
   const profileMenu: MenuProps['items'] = [
     {
@@ -76,7 +95,7 @@ const Home = (): React.ReactNode => {
       </Header>
 
       <Content className='bg-gray-50 p-4 md:p-6 lg:p-8'>
-        <div className='mx-auto max-w-7xl'>
+        <div className='mx-auto --home-section'>
           {/* Quick Actions */}
           <Row gutter={[16, 16]} className='mb-6'>
             <Col xs={24} md={8}>
@@ -110,14 +129,15 @@ const Home = (): React.ReactNode => {
 
           {/* Calendar and Tasks */}
           <Row gutter={[16, 16]}>
-            <Col xs={24} lg={16}>
-              <Card title='Schedule' extra={<Button type='link'>Analyze Schedule</Button>}>
-                <div className='flex justify-center items-center bg-gray-100 rounded h-96'>
-                  <CalendarOutlined className='text-4xl text-gray-400' />
+            <Col xs={24} lg={18}>
+              <Card title='Schedule' extra={<Button type='link'>Analyze Schedule </Button>}>
+                <div className='flex justify-center items-center bg-gray-100 rounded h-96 --calendar-section'>
+                  {/* <CalendarOutlined className='text-4xl text-gray-400' /> */}
+                  <ContinuousCalendar onClick={_onClickHandler} />
                 </div>
               </Card>
             </Col>
-            <Col xs={24} lg={8}>
+            <Col xs={24} lg={6}>
               <Card title='Tasks' extra={<Button type='link'>View All</Button>}>
                 {[
                   { title: 'Study Mathematics', time: '2 hours', priority: 'High' },
