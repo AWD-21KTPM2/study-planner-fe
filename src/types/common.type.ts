@@ -1,4 +1,4 @@
-export enum SortOrder {
-  ASC = 'ASC',
-  DESC = 'DESC'
+export interface IModalMethods {
+  showModal: () => void
+  hideModal: () => void
 }

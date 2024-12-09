@@ -39,6 +39,7 @@ export default [
         }
       ],
       'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
       'react/jsx-no-target-blank': 'off',
       'simple-import-sort/imports': 'warn',
       'simple-import-sort/exports': 'warn',

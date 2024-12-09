@@ -2,23 +2,9 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import CommonButton from '../button/CommonButton'
+import { DATE_OF_WEEK, MONTH_NAMES } from '@/constants/date.const'
 
-const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December'
-]
+import CommonButton from '../button/CommonButton'
 
 interface ContinuousCalendarProps {
   onClick?: (_day: number, _month: number, _year: number) => void
@@ -29,7 +15,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
   const dayRefs = useRef<(HTMLDivElement | null)[]>([])
   const [year, setYear] = useState<number>(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState<number>(0)
-  const monthOptions = monthNames.map((month, index) => ({ name: month, value: `${index}` }))
+  const monthOptions = MONTH_NAMES.map((month, index) => ({ name: month, value: `${index}` }))
 
   const scrollToDay = (monthIndex: number, dayIndex: number): void => {
     const targetDayIndex = dayRefs.current.findIndex(
@@ -154,7 +140,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
               </span>
               {isNewMonth && (
                 <span className='absolute bottom-0.5 left-0 w-full truncate px-1.5 text-sm font-semibold text-slate-300 sm:bottom-0 sm:text-lg lg:bottom-2.5 lg:left-3.5 lg:-mb-1 lg:w-fit lg:px-0 lg:text-xl 2xl:mb-[-4px] 2xl:text-2xl'>
-                  {monthNames[month]}
+                  {MONTH_NAMES[month]}
                 </span>
               )}
             </div>
@@ -260,7 +246,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
           </div>
         </div>
         <div className='grid w-full grid-cols-7 justify-between text-slate-500'>
-          {daysOfWeek.map((day, index) => (
+          {DATE_OF_WEEK.map((day, index) => (
             <div key={index} className='w-full border-b border-slate-200 py-2 text-center font-semibold'>
               {day}
             </div>
@@ -293,7 +279,7 @@ export const Select = ({ name, value, label, options = [], onChange, className }
       name={name}
       value={value}
       onChange={onChange}
-      className='cursor-pointer rounded-lg border border-gray-300 bg-white py-1.5 pl-2 pr-6 text-sm font-medium text-gray-900 hover:bg-gray-100 sm:rounded-xl sm:py-2.5 sm:pl-3 sm:pr-8'
+      className='cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-1.5 pl-2 pr-6 text-sm font-medium text-gray-900 hover:bg-gray-100 sm:rounded-xl sm:py-2.5 sm:pl-3 sm:pr-8'
       required
     >
       {options.map((option) => (
