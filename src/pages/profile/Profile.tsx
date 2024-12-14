@@ -13,7 +13,7 @@ const { Title, Text } = Typography
 const { Option } = Select
 
 const Profile = (): React.ReactNode => {
-  const { userInformation } = useAuth()
+  const { userInformation, authSession } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(false)
   const [profile, setProfile] = useState<UserInformation>()
@@ -29,13 +29,10 @@ const Profile = (): React.ReactNode => {
       try {
         if (!userInformation) return
         setLoading(true)
-        const userProfile = await getUserProfile()
+        const userProfile = await getUserProfile(authSession)
 
         setProfile(userProfile)
         form.setFieldsValue(userProfile)
-      } catch (error) {
-        console.error('Error while fetching user profile:', error)
-        message.error('An unexpected error occurred')
       } finally {
         setLoading(false)
       }
@@ -70,7 +67,7 @@ const Profile = (): React.ReactNode => {
           </div>
           <Form form={form} layout='vertical' initialValues={profile} onFinish={onUpdateProfile}>
             <Form.Item name='name' label='Name' rules={[{ required: true, message: 'Name is required' }]}>
-              <Input prefix={<UserOutlined />} placeholder='Enter your name' disabled />
+              <Input prefix={<UserOutlined />} placeholder='Enter your name' />
             </Form.Item>
             <Form.Item
               name='email'
@@ -78,13 +75,13 @@ const Profile = (): React.ReactNode => {
               rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
               initialValue={profile?.email}
             >
-              <Input prefix={<MailOutlined />} placeholder='Enter your email' />
+              <Input prefix={<MailOutlined />} placeholder='Enter your email' disabled className='font-semibold' />
             </Form.Item>
             <Form.Item name='phone' label='Phone' rules={[{ required: true, message: 'Phone number is required' }]}>
-              <Input prefix={<PhoneOutlined />} placeholder='Enter your phone number' disabled />
+              <Input prefix={<PhoneOutlined />} placeholder='Enter your phone number' />
             </Form.Item>
-            <Form.Item name='country' label='Country'>
-              <Select placeholder='Select your country' disabled>
+            <Form.Item name='country' label='Country' className='text-left'>
+              <Select placeholder='Select your country'>
                 <Option value='USA'>United States</Option>
                 <Option value='UK'>United Kingdom</Option>
                 <Option value='Canada'>Canada</Option>
@@ -101,10 +98,10 @@ const Profile = (): React.ReactNode => {
                 }
               ]}
             >
-              <Input.TextArea rows={4} placeholder='Tell us a little about yourself' disabled />
+              <Input.TextArea rows={4} placeholder='Tell us a little about yourself' />
             </Form.Item>
             <Form.Item>
-              <Button type='primary' htmlType='submit' className='w-full' disabled>
+              <Button type='primary' htmlType='submit' className='w-full'>
                 Update Profile
               </Button>
             </Form.Item>

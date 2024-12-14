@@ -1,3 +1,7 @@
+import message from 'antd/es/message'
+import { AxiosError } from 'axios'
+
+import { ErrorType } from '@/types/error.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
 
 import { axiosClient } from '../axios-client.util'
@@ -20,11 +24,17 @@ export const googleLogin = async (token: string): Promise<LoginResponse> => {
   }
 }
 
-export const getUserProfile = async (): Promise<UserInformation> => {
+export const getUserProfile = async (authSession: string | null): Promise<UserInformation> => {
   try {
-    const response = await axiosClient.get(`user/profile`)
+    const response = await axiosClient.get(`user/profile`, {
+      headers: {
+        Authorization: `Bearer ${authSession}`
+      }
+    })
     return response.data
   } catch (error) {
-    throw new Error(`Error while fetching user profile: ${error}`)
+    const errorData = (error as AxiosError<ErrorType>).response?.data.detail
+    message.error(errorData)
+    throw new Error(errorData)
   }
 }
