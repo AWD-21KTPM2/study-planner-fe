@@ -10,3 +10,5 @@ export const STORAGE = {
   SESSION_STORAGE_ERROR_REMOVING: 'Error removing from session storage:',
   SESSION_STORAGE_ERROR_CLEARING: 'Error clearing session storage:'
 }
+
+export const API_ENDPOINT = import.meta.env.VITE_API_URL as string
