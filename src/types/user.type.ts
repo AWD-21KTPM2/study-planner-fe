@@ -17,6 +17,10 @@ export interface LoginResponse {
 
 // Interface for user information after login
 export interface UserInformation {
-  id: string
-  email: string
+  id?: string
+  name?: string
+  email?: string
+  phone?: string
+  country?: string
+  bio?: string
 }

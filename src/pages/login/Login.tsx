@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
+import { UserDTO } from '@/types/user.type'
 import { googleLogin, login } from '@/utils/apis/user-apis.util'
 
 const Login: React.FC = () => {

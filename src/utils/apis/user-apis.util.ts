@@ -20,9 +20,9 @@ export const googleLogin = async (token: string): Promise<LoginResponse> => {
   }
 }
 
-export const getUserProfile = async (email: string): Promise<UserInformation> => {
+export const getUserProfile = async (): Promise<UserInformation> => {
   try {
-    const response = await axiosClient.get(`user/profile/details?email=${email}`)
+    const response = await axiosClient.get(`user/profile`)
     return response.data
   } catch (error) {
     throw new Error(`Error while fetching user profile: ${error}`)

@@ -5,26 +5,19 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import useAuth from '@/hooks/useAuth'
+import { UserInformation } from '@/types/user.type'
 import { getUserProfile } from '@/utils/apis/user-apis.util'
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
 const { Option } = Select
 
-interface UserProfile {
-  name: string
-  email: string
-  phone: string
-  country: string
-  bio: string
-}
-
 const Profile = (): React.ReactNode => {
   const { userInformation } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState<boolean>(false)
-  const [profile, setProfile] = useState<UserProfile>()
-  const [form] = Form.useForm<UserProfile>()
+  const [profile, setProfile] = useState<UserInformation>()
+  const [form] = Form.useForm<UserInformation>()
 
   const onUpdateProfile = (): void => {
     // setProfile(values)
@@ -36,7 +29,7 @@ const Profile = (): React.ReactNode => {
       try {
         if (!userInformation) return
         setLoading(true)
-        const userProfile = await getUserProfile(userInformation.email)
+        const userProfile = await getUserProfile()
 
         setProfile(userProfile)
         form.setFieldsValue(userProfile)
