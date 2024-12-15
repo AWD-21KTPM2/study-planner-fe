@@ -1,18 +1,18 @@
 import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
-import { Button, Form, Input, message, Spin } from 'antd'
+import { Alert, Button, Form, Input, message, Spin } from 'antd'
 import Link from 'antd/es/typography/Link'
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
-import useAuth from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 import { UserDTO } from '@/types/user.type'
-import { googleLogin, login } from '@/utils/apis/user-apis.util'
+import { googleLogin } from '@/utils/apis/user-apis.util'
 
 const Login: React.FC = () => {
   const navigate = useNavigate()
-  const { setAuthSession } = useAuth()
+  const { login, isLoading, error, setAuthSession } = useAuth()
   const [_loading, setLoading] = useState<boolean>(false)
 
   const onGoogleSuccess = (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>): void => {
@@ -46,13 +46,8 @@ const Login: React.FC = () => {
 
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
-      setLoading(true)
-      const loginResponse = await login(data)
-
-      const { accessToken, id, email } = loginResponse.data
-
-      setAuthSession(accessToken, { id, email })
-      message.success(loginResponse.message)
+      await login(data)
+      message.success('Login successful')
       navigate(ROUTE.HOME)
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -67,7 +62,7 @@ const Login: React.FC = () => {
 
   return (
     <div className='flex justify-center items-center bg-gray-100 min-h-screen'>
-      <Spin spinning={_loading} size='large' fullscreen />
+      <Spin spinning={isLoading} size='large' fullscreen />
       <div className='bg-white shadow-lg p-6 rounded-lg w-full max-w-md'>
         <h2 className='mb-6 font-semibold text-2xl text-center text-gray-800'>Login</h2>
         <Form layout='vertical' onFinish={onFinish} className='space-y-4'>
@@ -128,6 +123,8 @@ const Login: React.FC = () => {
           </div>
         </Form>
       </div>
+
+      {error && <Alert message={error.message} type='error' className='right-0 bottom-0 left-0 absolute text-center' />}
     </div>
   )
 }

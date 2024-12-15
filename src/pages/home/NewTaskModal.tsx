@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { SelectProps } from 'antd'
 import { Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd'
-import { SubmitHandler, useForm } from 'react-hook-form'
-import { FormItem } from 'react-hook-form-antd'
+import { useEffect } from 'react'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import * as zod from 'zod'
 
 import {
@@ -13,7 +13,8 @@ import {
   taskStatusColorMap,
   TaskStatusOptions
 } from '@/constants/task.const'
-import { createTask } from '@/utils/apis/task-apis.util'
+import { useCreateTask } from '@/hooks/useTasks'
+import { Task } from '@/types/task.type'
 
 type LabelRender = SelectProps['labelRender']
 
@@ -22,13 +23,8 @@ interface NewTaskModalProps {
   onClose: () => void
 }
 
-interface NewTaskFormData {
-  name: string
-  description: string
-  priority: string
-  estimatedTime: number
-  status: string
-}
+// Move this to types/task.type.ts if reused elsewhere
+export type NewTaskFormData = Pick<Task, 'name' | 'description' | 'priority' | 'estimatedTime' | 'status'>
 
 const taskPriorityLabelRender: LabelRender = (props) => (
   <Tag color={taskPriorityColorMap[props.value as TaskPriority]}>{props.value}</Tag>
@@ -39,15 +35,25 @@ const taskStatusLabelRender: LabelRender = (props) => (
 )
 
 const newTaskSchema = zod.object({
-  name: zod.string().min(1, { message: 'Title is required' }),
-  description: zod.string().optional(),
-  priority: zod.string().min(1, { message: 'Priority is required' }),
-  estimatedTime: zod.number().min(1, { message: 'Estimated time is required' }),
-  status: zod.string().min(1, { message: 'Status is required' })
+  name: zod.string().min(1, 'Title is required').max(100, 'Title is too long'),
+  description: zod.string().max(500, 'Description is too long').optional(),
+  priority: zod.nativeEnum(TaskPriority, { required_error: 'Priority is required' }),
+  estimatedTime: zod
+    .number()
+    .min(1, 'Estimated time must be at least 1 minute')
+    .max(480, 'Estimated time cannot exceed 8 hours'),
+  status: zod.nativeEnum(TaskStatus, { required_error: 'Status is required' })
 })
 
 const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
-  const { reset, control, handleSubmit } = useForm<NewTaskFormData>({
+  const { mutate: createTask, isPending, isSuccess, error } = useCreateTask()
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<NewTaskFormData>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
       name: '',
@@ -58,20 +64,8 @@ const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
     }
   })
 
-  const onSubmit: SubmitHandler<NewTaskFormData> = (data) => {
-    console.log('Creating task with data:', data)
-    // if (!userInformation?.id) {
-    //   message.error('User not found')
-    //   return
-    // }
+  const onSubmit: SubmitHandler<NewTaskFormData> = async (data) => {
     createTask(data)
-      .then(() => {
-        message.success('Task created successfully')
-      })
-      .catch((error) => {
-        console.error(error)
-        message.error('Failed to create task')
-      })
   }
 
   const handleCancel = (): void => {
@@ -79,24 +73,87 @@ const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
     onClose()
   }
 
+  useEffect(() => {
+    if (isSuccess) {
+      message.success('Task created successfully')
+      reset()
+      onClose()
+    }
+  }, [isSuccess, reset, onClose])
+
+  useEffect(() => {
+    if (error) {
+      message.error(error instanceof Error ? error.message : 'Failed to create task')
+    }
+  }, [error])
+
   return (
-    <Modal open={isOpen} onCancel={handleCancel} title='New Task' onOk={handleSubmit(onSubmit)}>
-      <Form layout='vertical'>
-        <FormItem control={control} label='Title' name='name'>
-          <Input placeholder='eg. Laundry' />
-        </FormItem>
-        <FormItem control={control} label='Description' name='description'>
-          <Input.TextArea rows={4} placeholder='eg. Do the laundry' />
-        </FormItem>
-        <FormItem control={control} label='Priority' name='priority'>
-          <Select options={TaskPriorityOptions} labelRender={taskPriorityLabelRender} />
-        </FormItem>
-        <FormItem control={control} label='Estimated Time' name='estimatedTime'>
-          <InputNumber addonAfter='minutes' />
-        </FormItem>
-        <FormItem control={control} label='Status' name='status'>
-          <Select options={TaskStatusOptions} labelRender={taskStatusLabelRender} />
-        </FormItem>
+    <Modal
+      open={isOpen}
+      onCancel={handleCancel}
+      title='New Task'
+      onOk={handleSubmit(onSubmit)}
+      confirmLoading={isPending}
+      destroyOnClose
+    >
+      <Form layout='vertical' className='space-y-4'>
+        <Controller
+          name='name'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Title' validateStatus={errors.name ? 'error' : ''} help={errors.name?.message}>
+              <Input {...field} placeholder='eg. Laundry' />
+            </Form.Item>
+          )}
+        />
+
+        <Controller
+          name='description'
+          control={control}
+          render={({ field }) => (
+            <Form.Item
+              label='Description'
+              validateStatus={errors.description ? 'error' : ''}
+              help={errors.description?.message}
+            >
+              <Input.TextArea {...field} rows={4} placeholder='eg. Do the laundry' />
+            </Form.Item>
+          )}
+        />
+
+        <Controller
+          name='priority'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Priority' validateStatus={errors.priority ? 'error' : ''} help={errors.priority?.message}>
+              <Select {...field} options={TaskPriorityOptions} labelRender={taskPriorityLabelRender} />
+            </Form.Item>
+          )}
+        />
+
+        <Controller
+          name='estimatedTime'
+          control={control}
+          render={({ field }) => (
+            <Form.Item
+              label='Estimated Time'
+              validateStatus={errors.estimatedTime ? 'error' : ''}
+              help={errors.estimatedTime?.message}
+            >
+              <InputNumber {...field} addonAfter='minutes' min={1} max={480} />
+            </Form.Item>
+          )}
+        />
+
+        <Controller
+          name='status'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Status' validateStatus={errors.status ? 'error' : ''} help={errors.status?.message}>
+              <Select {...field} options={TaskStatusOptions} labelRender={taskStatusLabelRender} />
+            </Form.Item>
+          )}
+        />
       </Form>
     </Modal>
   )
