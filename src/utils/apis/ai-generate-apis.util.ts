@@ -1,4 +1,4 @@
-import { axiosClient } from '../axios-client.util'
+import axiosClient from '../axios-client.util'
 
 export const analyzeTaskByAI = async (authSession: string | null): Promise<string> => {
   try {

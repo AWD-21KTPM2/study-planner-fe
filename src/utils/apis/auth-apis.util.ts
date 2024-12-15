@@ -1,6 +1,6 @@
 import { JwtRefreshDTO } from '@/types/user.type'
 
-import { axiosClient } from '../axios-client.util'
+import axiosClient from '../axios-client.util'
 
 export const refreshToken = async (authSession: string | null): Promise<JwtRefreshDTO> => {
   try {
