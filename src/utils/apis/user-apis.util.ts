@@ -4,7 +4,7 @@ import { AxiosError } from 'axios'
 import { ErrorType } from '@/types/error.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
 
-import { axiosClient } from '../axios-client.util'
+import axiosClient from '../axios-client.util'
 
 export const login = async (data: UserDTO): Promise<LoginResponse> => {
   try {
@@ -24,13 +24,9 @@ export const googleLogin = async (token: string): Promise<LoginResponse> => {
   }
 }
 
-export const getUserProfile = async (authSession: string | null): Promise<UserInformation> => {
+export const getUserProfile = async (): Promise<UserInformation> => {
   try {
-    const response = await axiosClient.get(`user/profile`, {
-      headers: {
-        Authorization: `Bearer ${authSession}`
-      }
-    })
+    const response = await axiosClient.get(`user/profile`)
     return response.data
   } catch (error) {
     const errorData = (error as AxiosError<ErrorType>).response?.data.detail
