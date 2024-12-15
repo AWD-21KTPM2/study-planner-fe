@@ -7,8 +7,8 @@ import { localStorageAdapter } from './adapter/local-storage.adapter'
 
 export interface AuthState {
   authSession: string | null // Store the JWT token
-  userInformation: UserInformation | null
-  setAuthSession: (token: string, userInformation: UserInformation | null) => void
+  userInformation: UserInformation | null | undefined
+  setAuthSession: (token: string, userInformation: UserInformation | null | undefined) => void
   clearAuthSession: () => void
 }
 
@@ -17,7 +17,7 @@ const useAuthStore = create<AuthState>()(
     (set) => ({
       authSession: null,
       userInformation: null,
-      setAuthSession: (token: string, userInformation: UserInformation | null): void =>
+      setAuthSession: (token: string, userInformation: UserInformation | null | undefined): void =>
         set({ authSession: token, userInformation }),
       clearAuthSession: (): void => set({ authSession: null, userInformation: null })
     }),

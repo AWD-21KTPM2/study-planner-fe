@@ -105,7 +105,6 @@ export const useAuth = (): AuthHookProps => {
     clearAuthSession,
     isLoggedIn: Boolean(authSession) && !isTokenExpired(), // Boolean indicating if the user is logged in
     userInformation: userInformation || null,
-    isLoggedIn: Boolean(authSession),
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
     isLoading: isLoading || loginMutation.isPending || logoutMutation.isPending,

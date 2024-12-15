@@ -1,16 +1,15 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined, RobotOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
 
+import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
 import CommonModal from '@/components/modal/CommonModal'
-import {useAuth} from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
+import { useTasks } from '@/hooks/useTasks'
 import { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
-import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
-
-import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
-import { useTasks } from '@/hooks/useTasks'
 
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
