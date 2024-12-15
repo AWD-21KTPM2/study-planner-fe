@@ -3,7 +3,7 @@ import axiosClient from '@/utils/axios-client.util'
 
 export type ResponseData<T> = {
   messages: string
-  data: T
+  data?: T
 }
 
 export type TaskResponse = {
@@ -21,11 +21,17 @@ export const getTasksByUserId = async (): Promise<ResponseData<TaskResponse>> =>
   return response.data
 }
 
-export const updateTask = async (taskId: string, data: Task): Promise<Task> => {
-  const response = await axiosClient.put<Task>(`task/${taskId}`, data)
+export const getTaskById = async (taskId: string): Promise<ResponseData<TaskResponse>> => {
+  const response = await axiosClient.get<ResponseData<TaskResponse>>(`task/${taskId}`)
   return response.data
 }
 
-export const deleteTask = async (taskId: string): Promise<void> => {
-  await axiosClient.delete(`task/${taskId}`)
+export const updateTask = async (taskId: string, data: Partial<Task>): Promise<ResponseData<Task>> => {
+  const response = await axiosClient.put<ResponseData<Task>>(`task/${taskId}`, data)
+  return response.data
+}
+
+export const deleteTask = async (taskId: string): Promise<ResponseData<Task>> => {
+  const response = await axiosClient.delete<ResponseData<Task>>(`task/${taskId}`)
+  return response.data
 }

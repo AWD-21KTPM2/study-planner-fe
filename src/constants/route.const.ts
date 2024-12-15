@@ -4,5 +4,6 @@ export const ROUTE = {
   LOGIN: '/login',
   REGISTER: '/register',
   PROFILE: '/profile',
+  TASKS: '/tasks',
   NOT_FOUND: '/404'
 }

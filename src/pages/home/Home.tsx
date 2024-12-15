@@ -1,7 +1,7 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Empty, Row, Typography } from 'antd'
+import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 import React, { useState } from 'react'
 
 import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
@@ -10,16 +10,16 @@ import { useTasks } from '@/hooks/useTasks'
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
 import TaskList from './TaskList'
-import TaskViewAllModal from './TaskViewAllModal'
 
 const Home = (): React.ReactNode => {
   const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
-  const [isViewAllOpen, setIsViewAllOpen] = useState<boolean>(false)
 
   const { isLoading, data: tasks, error } = useTasks()
 
   return (
     <div className='mx-auto --home-section'>
+      {isLoading && <Spin fullscreen />}
+
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
         <Col xs={24} md={8}>
@@ -67,7 +67,7 @@ const Home = (): React.ReactNode => {
             title='Tasks'
             loading={isLoading}
             extra={
-              <Button type='link' onClick={() => setIsViewAllOpen(true)}>
+              <Button type='link' href='/tasks'>
                 View All
               </Button>
             }
@@ -78,17 +78,14 @@ const Home = (): React.ReactNode => {
                 description={<Typography.Text>Task not found</Typography.Text>}
               />
             ) : (
-              <TaskList task_list={tasks} limit={5} />
+              <div className='h-[43rem] overflow-y-auto'>
+                <TaskList task_list={tasks} limit={tasks.length} />
+              </div>
             )}
           </Card>
         </Col>
       </Row>
       <NewTaskModal isOpen={isNewTaskOpen} onClose={() => setIsNewTaskOpen(false)} />
-      <TaskViewAllModal
-        isOpen={isViewAllOpen}
-        onClose={() => setIsViewAllOpen(false)}
-        task_list={error ? [] : (tasks ?? [])}
-      />
     </div>
   )
 }
