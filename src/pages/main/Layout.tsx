@@ -15,7 +15,7 @@ import React from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
-import useAuth from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 
 const { Header, Content } = Layout
 
@@ -27,7 +27,7 @@ const menuList = [
 ]
 
 const CommonLayout = (): React.ReactNode => {
-  const { clearAuthSession } = useAuth()
+  const { logout } = useAuth()
   const navigate = useNavigate()
 
   const profileMenu: MenuProps['items'] = [
@@ -45,7 +45,7 @@ const CommonLayout = (): React.ReactNode => {
       key: '3',
       icon: <LogoutOutlined />,
       label: 'Logout',
-      onClick: clearAuthSession
+      onClick: logout
     }
   ]
   const menuItems = menuList.map((menu, index) => ({

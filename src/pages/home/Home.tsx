@@ -1,16 +1,20 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined, RobotOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row, Tag } from 'antd'
 import React, { useRef, useState } from 'react'
 
 import CommonModal from '@/components/modal/CommonModal'
-import useAuth from '@/hooks/useAuth'
+import {useAuth} from '@/hooks/useAuth'
 import { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
+import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 
-import { ContinuousCalendar } from '../../components/calendar/ContinuousCalendar'
+import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
+import { useTasks } from '@/hooks/useTasks'
+
 import ActionCard from './ActionCard'
+import NewTaskModal from './NewTaskModal'
+import TaskList from './TaskList'
 
 const Home = (): React.ReactNode => {
   const { authSession } = useAuth()
@@ -21,6 +25,9 @@ const Home = (): React.ReactNode => {
     // const snackMessage = `Clicked on ${MONTH_NAMES[month]} ${day}, ${year}`
     // createSnack(snackMessage, 'success')
   }
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
+
+  const { isLoading, data: tasks, error } = useTasks()
 
   const analyzeTaskHandler = async (): Promise<void> => {
     refAnalyzeModal?.current?.showModal()
@@ -32,6 +39,8 @@ const Home = (): React.ReactNode => {
 
   return (
     <div className='mx-auto --home-section'>
+      {isLoading && <Spin fullscreen />}
+
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
         <Col xs={24} md={6}>
@@ -49,7 +58,9 @@ const Home = (): React.ReactNode => {
             description='Create a study task'
             className='bg-green-50 hover:bg-green-200 shadow-md'
             icon={<CheckSquareOutlined className='text-2xl text-green-600' />}
-            action={() => {}}
+            action={() => {
+              setIsNewTaskOpen(true)
+            }}
           />
         </Col>
         <Col xs={24} md={6}>
@@ -76,36 +87,37 @@ const Home = (): React.ReactNode => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={18}>
           <Card title='Schedule' extra={<Button type='link'>Analyze Schedule </Button>}>
-            <div className='flex justify-center items-center bg-gray-100 rounded h-96 --calendar-section'>
-              {/* <CalendarOutlined className='text-4xl text-gray-400' /> */}
-              <ContinuousCalendar onClick={_onClickHandler} />
+            <div className='flex justify-center items-center bg-gray-100 rounded min-w-full h-96 --calendar-section'>
+              <DragnDropCalendar />
             </div>
           </Card>
         </Col>
         <Col xs={24} lg={6}>
-          <Card title='Tasks' extra={<Button type='link'>View All</Button>}>
-            {[
-              { title: 'Study Mathematics', time: '2 hours', priority: 'High' },
-              { title: 'Review Notes', time: '1 hour', priority: 'Medium' },
-              { title: 'Practice Problems', time: '1.5 hours', priority: 'Low' }
-            ].map((task, index) => (
-              <Card key={index} size='small' className='mb-3 last:mb-0'>
-                <div className='flex justify-between items-center'>
-                  <div>
-                    <div className='font-medium'>{task.title}</div>
-                    <div className='text-gray-500 text-sm'>{task.time} estimated</div>
-                  </div>
-                  <Tag color={task.priority === 'High' ? 'red' : task.priority === 'Medium' ? 'gold' : 'green'}>
-                    {task.priority}
-                  </Tag>
-                </div>
-              </Card>
-            ))}
+          <Card
+            title='Tasks'
+            loading={isLoading}
+            extra={
+              <Button type='link' href='/tasks'>
+                View All
+              </Button>
+            }
+          >
+            {error || !tasks ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={<Typography.Text>Task not found</Typography.Text>}
+              />
+            ) : (
+              <div className='h-[43rem] overflow-y-auto'>
+                <TaskList task_list={tasks} limit={tasks.length} />
+              </div>
+            )}
           </Card>
         </Col>
       </Row>
 
       <CommonModal title='AI Analysis' content={htmlAnalysis} ref={refAnalyzeModal}></CommonModal>
+      <NewTaskModal isOpen={isNewTaskOpen} onClose={() => setIsNewTaskOpen(false)} />
     </div>
   )
 }

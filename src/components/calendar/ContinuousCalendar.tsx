@@ -139,7 +139,7 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
                 {day}
               </span>
               {isNewMonth && (
-                <span className='absolute bottom-0.5 left-0 w-full truncate px-1.5 text-sm font-semibold text-slate-300 sm:bottom-0 sm:text-lg lg:bottom-2.5 lg:left-3.5 lg:-mb-1 lg:w-fit lg:px-0 lg:text-xl 2xl:mb-[-4px] 2xl:text-2xl'>
+                <span className='bottom-0.5 sm:bottom-0 lg:bottom-2.5 left-0 lg:left-3.5 absolute lg:-mb-1 2xl:mb-[-4px] px-1.5 lg:px-0 w-full lg:w-fit font-semibold text-slate-300 text-sm sm:text-lg lg:text-xl 2xl:text-2xl truncate'>
                   {MONTH_NAMES[month]}
                 </span>
               )}
@@ -183,27 +183,27 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
   }, [])
 
   return (
-    <div className='no-scrollbar calendar-container max-h-full overflow-y-scroll rounded-t-2xl bg-white pb-10 text-slate-800 shadow-xl'>
-      <div className='sticky -top-px z-50 w-full rounded-t-2xl bg-white px-5 pt-7 sm:px-8 sm:pt-8'>
-        <div className='mb-4 flex w-full flex-wrap items-center justify-between gap-6'>
+    <div className='bg-white shadow-xl pb-10 min-w-full max-h-full text-slate-800 overflow-y-scroll calendar-container no-scrollbar'>
+      <div className='-top-px z-50 sticky bg-white px-5 sm:px-8 pt-7 sm:pt-8 rounded-t-2xl w-full'>
+        <div className='flex flex-wrap justify-between items-center gap-6 mb-4 w-full'>
           <div className='flex flex-wrap gap-2 sm:gap-3'>
             <Select name='' value={`${selectedMonth}`} options={monthOptions} onChange={handleMonthChange} />
             <button
               onClick={handleTodayClick}
               type='button'
-              className='rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-900 hover:bg-gray-100 lg:px-5 lg:py-2.5'
+              className='border-gray-300 bg-white hover:bg-gray-100 px-3 lg:px-5 py-1.5 lg:py-2.5 border rounded-lg font-medium text-gray-900 text-sm'
             >
               Today
             </button>
             <CommonButton>+ Add Event</CommonButton>
           </div>
-          <div className='flex w-fit items-center justify-between'>
+          <div className='flex justify-between items-center w-fit'>
             <button
               onClick={handlePrevYear}
-              className='rounded-full border border-slate-300 p-1 transition-colors hover:bg-slate-100 sm:p-2'
+              className='border-slate-300 hover:bg-slate-100 p-1 sm:p-2 border rounded-full transition-colors'
             >
               <svg
-                className='size-5 text-slate-800'
+                className='text-slate-800 size-5'
                 aria-hidden='true'
                 xmlns='http://www.w3.org/2000/svg'
                 width='24'
@@ -220,13 +220,13 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
                 />
               </svg>
             </button>
-            <h1 className='min-w-16 text-center text-lg font-semibold sm:min-w-20 sm:text-xl'>{year}</h1>
+            <h1 className='min-w-16 sm:min-w-20 font-semibold text-center text-lg sm:text-xl'>{year}</h1>
             <button
               onClick={handleNextYear}
-              className='rounded-full border border-slate-300 p-1 transition-colors hover:bg-slate-100 sm:p-2'
+              className='border-slate-300 hover:bg-slate-100 p-1 sm:p-2 border rounded-full transition-colors'
             >
               <svg
-                className='size-5 text-slate-800'
+                className='text-slate-800 size-5'
                 aria-hidden='true'
                 xmlns='http://www.w3.org/2000/svg'
                 width='24'
@@ -245,15 +245,15 @@ export const ContinuousCalendar: React.FC<ContinuousCalendarProps> = ({ onClick 
             </button>
           </div>
         </div>
-        <div className='grid w-full grid-cols-7 justify-between text-slate-500'>
-          {DATE_OF_WEEK.map((day, index) => (
-            <div key={index} className='w-full border-b border-slate-200 py-2 text-center font-semibold'>
+        <div className='justify-between grid grid-cols-7 w-full text-slate-500'>
+          {DATE_OF_WEEK.map((day, _) => (
+            <div key={day} className='border-slate-200 py-2 border-b w-full font-semibold text-center'>
               {day}
             </div>
           ))}
         </div>
       </div>
-      <div className='w-full px-5 pt-4 sm:px-8 sm:pt-6'>{generateCalendar}</div>
+      <div className='px-5 sm:px-8 pt-4 sm:pt-6 w-full'>{generateCalendar}</div>
     </div>
   )
 }
@@ -270,7 +270,7 @@ export interface SelectProps {
 export const Select = ({ name, value, label, options = [], onChange, className }: SelectProps): React.ReactNode => (
   <div className={`relative ${className}`}>
     {label && (
-      <label htmlFor={name} className='mb-2 block font-medium text-slate-800'>
+      <label htmlFor={name} className='block mb-2 font-medium text-slate-800'>
         {label}
       </label>
     )}
@@ -279,7 +279,7 @@ export const Select = ({ name, value, label, options = [], onChange, className }
       name={name}
       value={value}
       onChange={onChange}
-      className='cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white py-1.5 pl-2 pr-6 text-sm font-medium text-gray-900 hover:bg-gray-100 sm:rounded-xl sm:py-2.5 sm:pl-3 sm:pr-8'
+      className='border-gray-300 bg-white hover:bg-gray-100 py-1.5 sm:py-2.5 pr-6 sm:pr-8 pl-2 sm:pl-3 border rounded-lg sm:rounded-xl font-medium text-gray-900 text-sm cursor-pointer appearance-none'
       required
     >
       {options.map((option) => (
@@ -288,8 +288,8 @@ export const Select = ({ name, value, label, options = [], onChange, className }
         </option>
       ))}
     </select>
-    <span className='pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-1 sm:pr-2'>
-      <svg className='size-5 text-slate-600' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'>
+    <span className='right-0 absolute inset-y-0 flex items-center ml-3 pr-1 sm:pr-2 pointer-events-none'>
+      <svg className='text-slate-600 size-5' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'>
         <path
           fillRule='evenodd'
           d='M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z'

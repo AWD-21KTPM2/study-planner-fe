@@ -7,6 +7,7 @@ import RenderMain from '@/pages/main/RenderMain'
 import NotFound from '@/pages/not-found/NotFound'
 import Profile from '@/pages/profile/Profile'
 import Register from '@/pages/sign-up/Register'
+import Tasks from '@/pages/tasks'
 
 import PublicRoute from './PublicRoute'
 
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTE.HOME,
             element: <Home />
+          },
+          {
+            path: ROUTE.TASKS,
+            element: <Tasks />
           },
           {
             path: ROUTE.PROFILE,

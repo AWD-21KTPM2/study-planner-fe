@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { ROUTE } from '@/constants/route.const'
-import useAuth from '@/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 import ProtectedRoute from '@/routers/ProtectedRoute'
 
 import CommonLayout from './Layout'
