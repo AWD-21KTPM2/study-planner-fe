@@ -24,3 +24,17 @@ export interface UserInformation {
   country?: string
   bio?: string
 }
+
+export interface DecodedJwtToken {
+  id: string
+  email: string
+  iat: number
+  exp: number
+}
+
+export interface JwtRefreshDTO {
+  id: string
+  email: string
+  accessToken: string
+  refreshToken: string
+}
