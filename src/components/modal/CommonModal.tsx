@@ -1,7 +1,7 @@
 import { Button, Modal } from 'antd'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
-import { IModalMethods } from '@/types/common.type'
+import { IModalMethods } from '@/types/modal.type'
 
 export interface IModalProps {
   title: string

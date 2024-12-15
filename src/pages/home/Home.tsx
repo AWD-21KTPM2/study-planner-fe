@@ -1,23 +1,40 @@
 import '@/pages/home/home.scss'
 
-import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined } from '@ant-design/icons'
+import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined, RobotOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Row, Tag } from 'antd'
-import React from 'react'
+import React, { useRef, useState } from 'react'
+
+import CommonModal from '@/components/modal/CommonModal'
+import useAuth from '@/hooks/useAuth'
+import { IModalMethods } from '@/types/modal.type'
+import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
 
 import { ContinuousCalendar } from '../../components/calendar/ContinuousCalendar'
 import ActionCard from './ActionCard'
 
 const Home = (): React.ReactNode => {
+  const { authSession } = useAuth()
+  const [htmlAnalysis, setHtmlAnalysis] = useState<string>()
+  const refAnalyzeModal = useRef<IModalMethods | null>(null)
+
   const _onClickHandler = (_day: number, _month: number, _year: number): void => {
     // const snackMessage = `Clicked on ${MONTH_NAMES[month]} ${day}, ${year}`
     // createSnack(snackMessage, 'success')
+  }
+
+  const analyzeTaskHandler = async (): Promise<void> => {
+    refAnalyzeModal?.current?.showModal()
+
+    const AIResponse = await analyzeTaskByAI(authSession)
+    console.log('AIResponse', AIResponse)
+    setHtmlAnalysis(AIResponse)
   }
 
   return (
     <div className='mx-auto --home-section'>
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='Start Focus Timer'
             description='Begin a focused session'
@@ -26,7 +43,7 @@ const Home = (): React.ReactNode => {
             action={() => {}}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='Add New Task'
             description='Create a study task'
@@ -35,13 +52,22 @@ const Home = (): React.ReactNode => {
             action={() => {}}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='View Progress'
             description='Check your study progress'
             className='bg-purple-50 hover:bg-purple-200 shadow-md'
             icon={<BarChartOutlined className='text-2xl text-purple-600' />}
             action={() => {}}
+          />
+        </Col>
+        <Col xs={24} md={6}>
+          <ActionCard
+            title='Analyze Schedule'
+            description='Analyze your study schedule with AI'
+            className='bg-orange-50 hover:bg-orange-200 shadow-md'
+            icon={<RobotOutlined className='text-2xl text-orange-600' />}
+            action={analyzeTaskHandler}
           />
         </Col>
       </Row>
@@ -78,6 +104,8 @@ const Home = (): React.ReactNode => {
           </Card>
         </Col>
       </Row>
+
+      <CommonModal title='AI Analysis' content={htmlAnalysis} ref={refAnalyzeModal}></CommonModal>
     </div>
   )
 }
