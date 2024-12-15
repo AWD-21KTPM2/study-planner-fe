@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { SelectProps } from 'antd'
-import { DatePicker, Form, Input, InputNumber, Modal, Select, Tag } from 'antd'
+import { DatePicker, Form, Input, InputNumber, message, Modal, Select, Tag } from 'antd'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEffect } from 'react'
@@ -15,19 +15,20 @@ import {
   taskStatusColorMap,
   TaskStatusOptions
 } from '@/constants/task.const'
-import { useCreateTask } from '@/hooks/useTasks'
+import { useTask, useUpdateTask } from '@/hooks/useTasks'
 import { Task } from '@/types/task.type'
 dayjs.extend(utc)
 
 type LabelRender = SelectProps['labelRender']
 
-interface NewTaskModalProps {
+interface EditTaskModalProps {
   isOpen: boolean
   onClose: () => void
+  taskId: string
 }
 
 // Move this to types/task.type.ts if reused elsewhere
-export type NewTaskFormData = Pick<
+export type EditTaskFormData = Pick<
   Task,
   'name' | 'description' | 'priority' | 'estimatedTime' | 'status' | 'startDate' | 'endDate'
 >
@@ -49,50 +50,56 @@ const newTaskSchema = zod.object({
     .min(1, 'Estimated time must be at least 1 minute')
     .max(480, 'Estimated time cannot exceed 8 hours'),
   startDate: zod.date().optional(),
-  endDate: zod
-    .date()
-    .optional()
-    .refine((data) => dayjs(data).isAfter(dayjs()), {
-      message: 'End date must be after start date'
-    }),
+  endDate: zod.date().optional(),
   status: zod.nativeEnum(TaskStatus, { required_error: 'Status is required' })
 })
 
-const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
-  const { mutate: createTask, isPending, reset: resetCreateTask, isSuccess } = useCreateTask()
+const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Element => {
+  const { mutate: updateTask, isPending, reset: resetUpdateTask, isSuccess } = useUpdateTask()
+  const { data: task } = useTask(taskId)
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors }
-  } = useForm<NewTaskFormData>({
+  } = useForm<EditTaskFormData>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      priority: TaskPriority.LOW,
-      estimatedTime: 10,
-      status: TaskStatus.TODO,
-      startDate: dayjs().toDate(),
-      endDate: dayjs().add(1, 'hour').toDate()
+      name: task?.name,
+      description: task?.description,
+      priority: task?.priority,
+      estimatedTime: task?.estimatedTime,
+      status: task?.status,
+      startDate: task?.startDate,
+      endDate: task?.endDate
     }
   })
 
-  const onSubmit: SubmitHandler<NewTaskFormData> = async (data) => {
-    createTask(data)
+  useEffect(() => {
+    if (task) {
+      reset(task)
+    }
+  }, [task])
+
+  const onSubmit: SubmitHandler<EditTaskFormData> = async (data) => {
+    if (!taskId) {
+      message.error('Task ID is required')
+      return
+    }
+    updateTask({ id: taskId, task: data })
   }
 
   const handleCancel = (): void => {
     reset()
-    resetCreateTask()
+    resetUpdateTask()
     onClose()
   }
 
   useEffect(() => {
     if (isSuccess) {
       reset()
-      resetCreateTask()
+      resetUpdateTask()
       onClose()
     }
   }, [isSuccess])
@@ -219,4 +226,4 @@ const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
   )
 }
 
-export default NewTaskModal
+export default EditTaskModal

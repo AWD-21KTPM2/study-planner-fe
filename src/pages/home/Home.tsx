@@ -1,25 +1,25 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row } from 'antd'
+import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 import React, { useState } from 'react'
 
 import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
+import { useTasks } from '@/hooks/useTasks'
 
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
 import TaskList from './TaskList'
 
 const Home = (): React.ReactNode => {
-  const _onClickHandler = (_day: number, _month: number, _year: number): void => {
-    // const snackMessage = `Clicked on ${MONTH_NAMES[month]} ${day}, ${year}`
-    // createSnack(snackMessage, 'success')
-  }
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
 
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const { isLoading, data: tasks, error } = useTasks()
 
   return (
     <div className='mx-auto --home-section'>
+      {isLoading && <Spin fullscreen />}
+
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
         <Col xs={24} md={8}>
@@ -38,7 +38,7 @@ const Home = (): React.ReactNode => {
             className='bg-green-50 hover:bg-green-200 shadow-md'
             icon={<CheckSquareOutlined className='text-2xl text-green-600' />}
             action={() => {
-              setIsOpen(true)
+              setIsNewTaskOpen(true)
             }}
           />
         </Col>
@@ -63,13 +63,29 @@ const Home = (): React.ReactNode => {
           </Card>
         </Col>
         <Col xs={24} lg={6}>
-          <Card title='Tasks' extra={<Button type='link'>View All</Button>}>
-            <TaskList />
+          <Card
+            title='Tasks'
+            loading={isLoading}
+            extra={
+              <Button type='link' href='/tasks'>
+                View All
+              </Button>
+            }
+          >
+            {error || !tasks ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={<Typography.Text>Task not found</Typography.Text>}
+              />
+            ) : (
+              <div className='h-[43rem] overflow-y-auto'>
+                <TaskList task_list={tasks} limit={tasks.length} />
+              </div>
+            )}
           </Card>
         </Col>
       </Row>
-
-      <NewTaskModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <NewTaskModal isOpen={isNewTaskOpen} onClose={() => setIsNewTaskOpen(false)} />
     </div>
   )
 }
