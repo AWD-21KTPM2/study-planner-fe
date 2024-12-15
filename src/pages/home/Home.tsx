@@ -8,17 +8,20 @@ import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
 import CommonModal from '@/components/modal/CommonModal'
 import { useAuth } from '@/hooks/useAuth'
 import { useTasks } from '@/hooks/useTasks'
+import { AnalyzeTaskDTO } from '@/types/ai-generate.type'
 import { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
 
+import TaskAnalysisTable, { DataProps } from '../ai-generate/TaskAnalysisTable'
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
 import TaskList from './TaskList'
 
 const Home = (): React.ReactNode => {
   const { authSession } = useAuth()
-  const [htmlAnalysis, setHtmlAnalysis] = useState<string>()
+  const [taskAnalysis, setTaskAnalysis] = useState<DataProps[]>()
   const refAnalyzeModal = useRef<IModalMethods | null>(null)
+  const [isLoadingAnalyzes, setIsLoadingAnalyzes] = useState<boolean>(false)
 
   const _onClickHandler = (_day: number, _month: number, _year: number): void => {
     // const snackMessage = `Clicked on ${MONTH_NAMES[month]} ${day}, ${year}`
@@ -29,11 +32,18 @@ const Home = (): React.ReactNode => {
   const { isLoading, data: tasks, error } = useTasks()
 
   const analyzeTaskHandler = async (): Promise<void> => {
+    setIsLoadingAnalyzes(true)
+    setTaskAnalysis([])
     refAnalyzeModal?.current?.showModal()
 
-    const AIResponse = await analyzeTaskByAI(authSession)
-    console.log('AIResponse', AIResponse)
-    setHtmlAnalysis(AIResponse)
+    const AIResponse: AnalyzeTaskDTO[] = await analyzeTaskByAI(authSession)
+    const pipeAIResponse: DataProps[] = AIResponse.map(({ no: key, ...rest }) => ({ key, ...rest }) as DataProps)
+    setTaskAnalysis(pipeAIResponse as DataProps[])
+    setIsLoadingAnalyzes(false)
+  }
+
+  const analyzeTaskCancel = (): void => {
+    setTaskAnalysis([])
   }
 
   return (
@@ -115,7 +125,15 @@ const Home = (): React.ReactNode => {
         </Col>
       </Row>
 
-      <CommonModal title='AI Analysis' content={htmlAnalysis} ref={refAnalyzeModal}></CommonModal>
+      <CommonModal title='AI Analysis' width={1000} ref={refAnalyzeModal} handleCancel={analyzeTaskCancel}>
+        {isLoadingAnalyzes ? (
+          <div className='w-full flex justify-center'>
+            <Spin tip='Loading' size='large' />
+          </div>
+        ) : (
+          <TaskAnalysisTable dataSource={taskAnalysis} />
+        )}
+      </CommonModal>
       <NewTaskModal isOpen={isNewTaskOpen} onClose={() => setIsNewTaskOpen(false)} />
     </div>
   )

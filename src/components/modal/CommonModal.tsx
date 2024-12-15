@@ -5,13 +5,14 @@ import { IModalMethods } from '@/types/modal.type'
 
 export interface IModalProps {
   title: string
-  content: React.ReactNode
+  children?: React.ReactNode
   width?: number
   handleOk?: () => void
+  handleCancel?: () => void
 }
 
 const _CommonModal: React.ForwardRefRenderFunction<IModalMethods, IModalProps> = (
-  { title, content, handleOk, width },
+  { title, children, handleOk, handleCancel, width },
   ref
 ) => {
   const [open, setOpen] = useState<boolean>(false)
@@ -22,6 +23,9 @@ const _CommonModal: React.ForwardRefRenderFunction<IModalMethods, IModalProps> =
   }))
 
   const handleCancelChild = (): void => {
+    if (handleCancel) {
+      handleCancel()
+    }
     setOpen(false)
   }
 
@@ -55,7 +59,7 @@ const _CommonModal: React.ForwardRefRenderFunction<IModalMethods, IModalProps> =
             : null
         }
       >
-        <div className='content-box'>{content}</div>
+        <div className='content-box'>{children}</div>
       </Modal>
     </>
   )
