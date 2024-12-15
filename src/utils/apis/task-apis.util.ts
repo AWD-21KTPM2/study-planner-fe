@@ -1,5 +1,5 @@
 import { Task } from '@/types/task.type'
-import { axiosClient } from '@/utils/axios-client.util'
+import axiosClient from '@/utils/axios-client.util'
 
 type ResponseData<T> = {
   messages: string

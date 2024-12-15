@@ -1,7 +1,7 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Row, Tag } from 'antd'
+import { Button, Card, Col, Row } from 'antd'
 import React, { useState } from 'react'
 
 import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'

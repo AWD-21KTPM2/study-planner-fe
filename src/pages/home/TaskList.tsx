@@ -20,7 +20,7 @@ const TaskList: FC = () => {
   return (
     <div className='flex flex-col gap-4'>
       {tasks.slice(0, 5).map((task) => (
-        <TaskCard key={task.name} task={task} className='bg-gray-50 hover:bg-gray-100' />
+        <TaskCard key={task._id} task={task} className='bg-gray-50 hover:bg-gray-100' />
       ))}
     </div>
   )

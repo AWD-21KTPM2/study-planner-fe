@@ -4,12 +4,11 @@ import { AxiosError } from 'axios'
 import { ErrorType } from '@/types/error.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
 
-import { axiosClient } from '../axios-client.util'
+import axiosClient from '../axios-client.util'
 
 export const login = async (data: UserDTO): Promise<LoginResponse> => {
   try {
     const response = await axiosClient.post<LoginResponse>('user/login', data)
-    axiosClient.defaults.headers.common.Authorization = `Bearer ${response.data.data.accessToken}`
     return response.data
   } catch (error) {
     throw new Error(`Error while logging in: ${error}`)
