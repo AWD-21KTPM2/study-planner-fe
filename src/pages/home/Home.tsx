@@ -1,6 +1,6 @@
 import '@/pages/home/home.scss'
 
-import { BarChartOutlined, CheckSquareOutlined, ClockCircleOutlined, RobotOutlined } from '@ant-design/icons'
+import { BarChartOutlined, CheckSquareOutlined, RobotOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
 
@@ -22,11 +22,6 @@ const Home = (): React.ReactNode => {
   const [taskAnalysis, setTaskAnalysis] = useState<DataProps[]>()
   const refAnalyzeModal = useRef<IModalMethods | null>(null)
   const [isLoadingAnalyzes, setIsLoadingAnalyzes] = useState<boolean>(false)
-
-  const _onClickHandler = (_day: number, _month: number, _year: number): void => {
-    // const snackMessage = `Clicked on ${MONTH_NAMES[month]} ${day}, ${year}`
-    // createSnack(snackMessage, 'success')
-  }
   const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
 
   const { isLoading, data: tasks, error } = useTasks()
@@ -52,16 +47,7 @@ const Home = (): React.ReactNode => {
 
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
-        <Col xs={24} md={6}>
-          <ActionCard
-            title='Start Focus Timer'
-            description='Begin a focused session'
-            className='bg-blue-50 hover:bg-blue-200 shadow-md'
-            icon={<ClockCircleOutlined className='text-2xl text-blue-600' />}
-            action={() => {}}
-          />
-        </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='Add New Task'
             description='Create a study task'
@@ -72,7 +58,7 @@ const Home = (): React.ReactNode => {
             }}
           />
         </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='View Progress'
             description='Check your study progress'
@@ -81,7 +67,7 @@ const Home = (): React.ReactNode => {
             action={() => {}}
           />
         </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='Analyze Schedule'
             description='Analyze your study schedule with AI'
@@ -127,7 +113,7 @@ const Home = (): React.ReactNode => {
 
       <CommonModal title='AI Analysis' width={1000} ref={refAnalyzeModal} handleCancel={analyzeTaskCancel}>
         {isLoadingAnalyzes ? (
-          <div className='w-full flex justify-center'>
+          <div className='flex justify-center w-full'>
             <Spin tip='Loading' size='large' />
           </div>
         ) : (
