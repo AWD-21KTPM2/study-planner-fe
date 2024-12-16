@@ -92,8 +92,6 @@ export const useAuth = (): AuthHookProps => {
     const now = new Date()
     const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
 
-    console.log('timeUntilRefresh', timeUntilRefresh)
-
     if (timeUntilRefresh < periodTimeToRefresh) {
       const timeoutId = setTimeout(async () => {
         const tokenResponse: JwtRefreshDTO = await refreshTokenApi(authSession, refreshToken)

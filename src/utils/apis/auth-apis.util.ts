@@ -16,7 +16,6 @@ export const refreshTokenApi = async (
         }
       }
     )
-    console.log('response', response)
     return response.data.data
   } catch (error) {
     throw new Error(`Error while getting new access token: ${error}`)
