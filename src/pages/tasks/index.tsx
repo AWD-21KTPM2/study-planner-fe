@@ -1,5 +1,5 @@
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Empty, message, Space, Spin, Table, Tag, Typography } from 'antd'
+import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { Button, Empty, Input, message, Space, Spin, Table, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, ReactNode, useState } from 'react'
 
@@ -17,6 +17,15 @@ const TaskPage: FC = () => {
   const [isEditTaskOpen, setIsEditTaskOpen] = useState<boolean>(false)
   const [editTaskId, setEditTaskId] = useState<string | null>(null)
   const { mutate: deleteTask } = useDeleteTask()
+  const [searchQuery, setSearchQuery] = useState<string>('') // State for search input
+
+  // Filter tasks based on the search query
+  const filteredTasks = tasks?.filter(
+    (task) =>
+      task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
   const columns = [
     {
       title: 'Title',
@@ -103,29 +112,35 @@ const TaskPage: FC = () => {
   return (
     <>
       <div className='mx-auto container'>
-        <div className='flex justify-end'>
-          <Button type='primary' onClick={() => setIsNewTaskOpen(true)} className='mb-4 ml-auto'>
+        <div className='flex justify-between mb-4'>
+          <Input
+            placeholder='Search tasks by title or description'
+            prefix={<SearchOutlined />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ maxWidth: '300px' }}
+          />
+          <Button type='primary' onClick={() => setIsNewTaskOpen(true)}>
             <PlusOutlined /> Add Task
           </Button>
         </div>
         {isLoading && <Spin fullscreen />}
-        {tasks && tasks.length > 0 ? (
+        {filteredTasks && filteredTasks.length > 0 ? (
           <Table
-            key={tasks.length}
             bordered
-            dataSource={tasks}
+            dataSource={filteredTasks}
             columns={columns}
             rowKey='_id'
             scroll={{ y: '80vh' }}
             pagination={{
-              total: tasks.length,
+              total: filteredTasks.length,
               pageSize: 10,
               showSizeChanger: true,
               showTotal: (total) => `Total ${total} items`
             }}
           />
         ) : (
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Typography.Text>Task not found</Typography.Text>} />
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<Typography.Text>No tasks found</Typography.Text>} />
         )}
       </div>
 
