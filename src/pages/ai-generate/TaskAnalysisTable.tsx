@@ -1,3 +1,5 @@
+import './task-analysis-table.scss'
+
 import { Table, Tag } from 'antd'
 import React from 'react'
 
@@ -22,7 +24,7 @@ export interface DataProps {
 }
 
 const TaskAnalysisTable: React.FC<IAnalyzeTaskProps> = ({ dataSource }) => (
-  <Table<DataProps> dataSource={dataSource} pagination={false}>
+  <Table<DataProps> dataSource={dataSource} pagination={false} className='overflow-auto'>
     <Column title='Task Name' dataIndex='taskName' key='taskName' />
     <Column title='Start Date' dataIndex='startDate' key='startDate' />
     <Column title='End Date' dataIndex='endDate' key='endDate' />
