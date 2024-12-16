@@ -1,5 +1,5 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Button, Empty, Input, message, Space, Spin, Table, Tag, Typography } from 'antd'
+import { Button, Empty, Input, message, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import { FC, ReactNode, useState } from 'react'
 
@@ -10,6 +10,8 @@ import { Task } from '@/types/task.type'
 import NewTaskModal from '../home/NewTaskModal'
 import EditTaskModal from './EditTaskModal'
 
+const { Option } = Select
+
 const TaskPage: FC = () => {
   const { data: tasks, isLoading } = useTasks()
 
@@ -18,13 +20,18 @@ const TaskPage: FC = () => {
   const [editTaskId, setEditTaskId] = useState<string | null>(null)
   const { mutate: deleteTask } = useDeleteTask()
   const [searchQuery, setSearchQuery] = useState<string>('') // State for search input
+  const [filterStatus, setFilterStatus] = useState<TaskStatus | null>(null) // State for status filter
+  const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null) // State for priority filter
 
-  // Filter tasks based on the search query
-  const filteredTasks = tasks?.filter(
-    (task) =>
+  // Filter tasks based on search, status, and priority
+  const filteredTasks = tasks?.filter((task) => {
+    const matchesSearch =
       task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    const matchesStatus = filterStatus ? task.status === filterStatus : true
+    const matchesPriority = filterPriority ? task.priority === filterPriority : true
+    return matchesSearch && matchesStatus && matchesPriority
+  })
 
   const columns = [
     {
@@ -113,13 +120,41 @@ const TaskPage: FC = () => {
     <>
       <div className='mx-auto container'>
         <div className='flex justify-between mb-4'>
-          <Input
-            placeholder='Search tasks by title or description'
-            prefix={<SearchOutlined />}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ maxWidth: '300px' }}
-          />
+          <div className='flex gap-4'>
+            <Input
+              placeholder='Search tasks by title or description'
+              prefix={<SearchOutlined />}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ maxWidth: '300px' }}
+            />
+            <Select
+              placeholder='Filter by Status'
+              value={filterStatus}
+              onChange={(value) => setFilterStatus(value)}
+              allowClear
+              style={{ width: '150px' }}
+            >
+              {Object.values(TaskStatus).map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
+            <Select
+              placeholder='Filter by Priority'
+              value={filterPriority}
+              onChange={(value) => setFilterPriority(value)}
+              allowClear
+              style={{ width: '150px' }}
+            >
+              {Object.values(TaskPriority).map((priority) => (
+                <Option key={priority} value={priority}>
+                  {priority}
+                </Option>
+              ))}
+            </Select>
+          </div>
           <Button type='primary' onClick={() => setIsNewTaskOpen(true)}>
             <PlusOutlined /> Add Task
           </Button>
