@@ -52,8 +52,8 @@ const Login: React.FC = () => {
   const onGoogleSuccess = (response: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>): void => {
     googleLogin(response.access_token)
       .then((response) => {
-        const { accessToken, id, email } = response.data
-        setAuthSession(accessToken, { id, email })
+        const { accessToken, refreshToken, id, email } = response.data
+        setAuthSession(accessToken, refreshToken, { id, email })
         message.success(response.message)
         navigate(ROUTE.HOME)
       })

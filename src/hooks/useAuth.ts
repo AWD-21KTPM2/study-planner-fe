@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import useAuthStore, { AuthState } from '@/stores/auth.store'
 import { DecodedJwtToken, JwtRefreshDTO } from '@/types/user.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
-import { refreshToken } from '@/utils/apis/auth-apis.util'
+import { refreshTokenApi } from '@/utils/apis/auth-apis.util'
 import { getUserProfile, login } from '@/utils/apis/user-apis.util'
 import queryClient from '@/utils/query-client.util'
 
@@ -26,6 +26,7 @@ export const authKeys = {
 export const useAuth = (): AuthHookProps => {
   const queryClient = useQueryClient()
   const authSession = useAuthStore((state) => state.authSession)
+  const refreshToken = useAuthStore((state) => state.refreshToken)
   // const userInformation = useAuthStore((state) => state.userInformation)
   const { setAuthSession, clearAuthSession } = useAuthStore()
 
@@ -47,7 +48,10 @@ export const useAuth = (): AuthHookProps => {
     mutationFn: login,
     onSuccess: (response) => {
       localStorage.setItem('auth-data', JSON.stringify(response))
-      setAuthSession(response.data.accessToken, { email: response.data.email, id: response.data.id })
+      setAuthSession(response.data.accessToken, response.data.refreshToken, {
+        email: response.data.email,
+        id: response.data.id
+      })
       queryClient.invalidateQueries({ queryKey: authKeys.profile })
     }
   })
@@ -83,14 +87,19 @@ export const useAuth = (): AuthHookProps => {
   useEffect(() => {
     const expiration = getTokenExpiration()
     if (!expiration) return
+    const periodTimeToRefresh = 60000 // Refresh 1 minute before expiration
 
     const now = new Date()
-    const timeUntilRefresh = expiration.getTime() - now.getTime() - 60000 // Refresh 1 minute before expiration
+    const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
 
-    if (timeUntilRefresh > 0) {
+    if (timeUntilRefresh < periodTimeToRefresh) {
       const timeoutId = setTimeout(async () => {
-        const refreshTokenData: JwtRefreshDTO = await refreshToken(authSession)
-        setAuthSession(refreshTokenData.accessToken, userInformation)
+        const tokenResponse: JwtRefreshDTO = await refreshTokenApi(authSession, refreshToken)
+
+        setAuthSession(tokenResponse.accessToken, refreshToken, {
+          email: tokenResponse?.email,
+          id: tokenResponse?.id
+        })
       }, timeUntilRefresh)
 
       return (): void => clearTimeout(timeoutId) // Cleanup timeout on component unmount or token change
@@ -101,6 +110,7 @@ export const useAuth = (): AuthHookProps => {
 
   return {
     authSession,
+    refreshToken,
     setAuthSession,
     clearAuthSession,
     isLoggedIn: Boolean(authSession) && !isTokenExpired(), // Boolean indicating if the user is logged in
@@ -129,7 +139,10 @@ export const useLogin = (): UseMutationResult<LoginResponse, Error, UserDTO> => 
     mutationFn: login,
     onSuccess: (response) => {
       localStorage.setItem('auth-data', JSON.stringify(response))
-      setAuthSession(response.data.accessToken, { email: response.data.email, id: response.data.id })
+      setAuthSession(response.data.accessToken, response.data.refreshToken, {
+        email: response.data.email,
+        id: response.data.id
+      })
       queryClient.invalidateQueries({ queryKey: authKeys.profile })
     }
   })
