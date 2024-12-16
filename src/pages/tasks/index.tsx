@@ -33,6 +33,89 @@ const TaskPage: FC = () => {
     return matchesSearch && matchesStatus && matchesPriority
   })
 
+  // const columns = [
+  //   {
+  //     title: 'Title',
+  //     dataIndex: 'name',
+  //     key: 'name',
+  //     width: 100,
+  //     render: (name: string): ReactNode => <Typography.Text>{name}</Typography.Text>
+  //   },
+  //   {
+  //     title: 'Description',
+  //     dataIndex: 'description',
+  //     key: 'description',
+  //     width: 200
+  //   },
+  //   {
+  //     title: 'Start Date',
+  //     dataIndex: 'startDate',
+  //     key: 'startDate',
+  //     width: 100,
+  //     render: (startDate: Date): ReactNode => (
+  //       <Typography.Text>{startDate ? dayjs(startDate).format('DD/MM/YYYY HH:mm') : ''}</Typography.Text>
+  //     )
+  //   },
+  //   {
+  //     title: 'End Date',
+  //     dataIndex: 'endDate',
+  //     key: 'endDate',
+  //     width: 100,
+  //     render: (endDate: Date): ReactNode => (
+  //       <Typography.Text>{endDate ? dayjs(endDate).format('DD/MM/YYYY HH:mm') : ''}</Typography.Text>
+  //     )
+  //   },
+  //   {
+  //     title: 'Estimated Time',
+  //     dataIndex: 'estimatedTime',
+  //     key: 'estimatedTime',
+  //     width: 100,
+  //     render: (estimatedTime: number): ReactNode => <Typography.Text>{estimatedTime} minutes</Typography.Text>
+  //   },
+  //   {
+  //     title: 'Status',
+  //     dataIndex: 'status',
+  //     key: 'status',
+  //     width: 100,
+  //     render: (status: TaskStatus): ReactNode => <Tag color={taskStatusColorMap[status]}>{status}</Tag>
+  //   },
+  //   {
+  //     title: 'Priority',
+  //     dataIndex: 'priority',
+  //     key: 'priority',
+  //     width: 100,
+  //     render: (priority: TaskPriority): ReactNode => <Tag color={taskPriorityColorMap[priority]}>{priority}</Tag>
+  //   },
+  //   {
+  //     title: 'Actions',
+  //     key: 'actions',
+  //     width: 100,
+  //     render: (_: unknown, record: Task): ReactNode => (
+  //       <Space>
+  //         <Button
+  //           type='text'
+  //           icon={<EditOutlined />}
+  //           onClick={() => {
+  //             if (!record._id) {
+  //               message.error('Task ID is required')
+  //               return
+  //             }
+  //             setIsEditTaskOpen(true)
+  //             setEditTaskId(record._id)
+  //           }}
+  //         />
+  //         <Button
+  //           className='hover:!border-0 hover:ring-1 hover:ring-red-500'
+  //           type='text'
+  //           danger
+  //           icon={<DeleteOutlined />}
+  //           onClick={() => deleteTask(record._id ?? '')}
+  //         />
+  //       </Space>
+  //     )
+  //   }
+  // ]
+
   const columns = [
     {
       title: 'Title',
@@ -40,6 +123,7 @@ const TaskPage: FC = () => {
       key: 'name',
       width: 100,
       render: (name: string): ReactNode => <Typography.Text>{name}</Typography.Text>
+      // sorter: (a: Task, b: Task) => a.name.localeCompare(b.name)
     },
     {
       title: 'Description',
@@ -54,7 +138,8 @@ const TaskPage: FC = () => {
       width: 100,
       render: (startDate: Date): ReactNode => (
         <Typography.Text>{startDate ? dayjs(startDate).format('DD/MM/YYYY HH:mm') : ''}</Typography.Text>
-      )
+      ),
+      sorter: (a: Task, b: Task): number => new Date(a.startDate ?? 0).getTime() - new Date(b.startDate ?? 0).getTime()
     },
     {
       title: 'End Date',
@@ -63,28 +148,32 @@ const TaskPage: FC = () => {
       width: 100,
       render: (endDate: Date): ReactNode => (
         <Typography.Text>{endDate ? dayjs(endDate).format('DD/MM/YYYY HH:mm') : ''}</Typography.Text>
-      )
+      ),
+      sorter: (a: Task, b: Task): number => new Date(a.endDate ?? 0).getTime() - new Date(b.endDate ?? 0).getTime()
     },
     {
       title: 'Estimated Time',
       dataIndex: 'estimatedTime',
       key: 'estimatedTime',
       width: 100,
-      render: (estimatedTime: number): ReactNode => <Typography.Text>{estimatedTime} minutes</Typography.Text>
+      render: (estimatedTime: number): ReactNode => <Typography.Text>{estimatedTime} minutes</Typography.Text>,
+      sorter: (a: Task, b: Task): number => a.estimatedTime - b.estimatedTime
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
       width: 100,
-      render: (status: TaskStatus): ReactNode => <Tag color={taskStatusColorMap[status]}>{status}</Tag>
+      render: (status: TaskStatus): ReactNode => <Tag color={taskStatusColorMap[status]}>{status}</Tag>,
+      sorter: (a: Task, b: Task): number => a.status.localeCompare(b.status)
     },
     {
       title: 'Priority',
       dataIndex: 'priority',
       key: 'priority',
       width: 100,
-      render: (priority: TaskPriority): ReactNode => <Tag color={taskPriorityColorMap[priority]}>{priority}</Tag>
+      render: (priority: TaskPriority): ReactNode => <Tag color={taskPriorityColorMap[priority]}>{priority}</Tag>,
+      sorter: (a: Task, b: Task): number => a.priority.localeCompare(b.priority)
     },
     {
       title: 'Actions',
