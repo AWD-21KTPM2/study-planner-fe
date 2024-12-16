@@ -116,6 +116,20 @@ const TaskPage: FC = () => {
   //   }
   // ]
 
+  const priorityRank: { [key in TaskPriority]: number } = {
+    Low: 1,
+    Medium: 2,
+    High: 3,
+    Critical: 4
+  }
+
+  const statusRank: { [key in TaskStatus]: number } = {
+    Todo: 1,
+    'In Progress': 2,
+    Completed: 3,
+    Expired: 4
+  }
+
   const columns = [
     {
       title: 'Title',
@@ -165,7 +179,7 @@ const TaskPage: FC = () => {
       key: 'status',
       width: 100,
       render: (status: TaskStatus): ReactNode => <Tag color={taskStatusColorMap[status]}>{status}</Tag>,
-      sorter: (a: Task, b: Task): number => a.status.localeCompare(b.status)
+      sorter: (a: Task, b: Task): number => statusRank[a.status as TaskStatus] - statusRank[b.status as TaskStatus]
     },
     {
       title: 'Priority',
@@ -173,7 +187,8 @@ const TaskPage: FC = () => {
       key: 'priority',
       width: 100,
       render: (priority: TaskPriority): ReactNode => <Tag color={taskPriorityColorMap[priority]}>{priority}</Tag>,
-      sorter: (a: Task, b: Task): number => a.priority.localeCompare(b.priority)
+      sorter: (a: Task, b: Task): number =>
+        priorityRank[a.priority as TaskPriority] - priorityRank[b.priority as TaskPriority]
     },
     {
       title: 'Actions',
