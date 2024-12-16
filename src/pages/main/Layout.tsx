@@ -65,7 +65,7 @@ const CommonLayout = (): React.ReactNode => {
         <div className='flex items-center gap-4'>
           <Menu theme='light' mode='horizontal' defaultSelectedKeys={['1']} items={menuItems} />
           <Dropdown menu={{ items: profileMenu }} trigger={['click']}>
-            <Avatar icon={<UserOutlined />} className='bg-blue-600' />
+            <Avatar icon={<UserOutlined />} className='bg-blue-600 cursor-pointer' />
           </Dropdown>
         </div>
       </Header>
