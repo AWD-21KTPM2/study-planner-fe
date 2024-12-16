@@ -66,11 +66,11 @@ export const useAuth = (): AuthHookProps => {
   })
 
   // Decode the JWT token and extract the expiration time
-  const getTokenExpiration = (): Date | null => {
-    if (!authSession) return null
+  const getTokenExpiration = (token: string | null): Date | null => {
+    if (!token) return null
 
     try {
-      const decoded: DecodedJwtToken = jwtDecode(authSession)
+      const decoded: DecodedJwtToken = jwtDecode(token)
       return decoded?.exp ? new Date(decoded.exp * 1000) : null // Convert `exp` to a Date object
     } catch (error) {
       console.error('Invalid JWT token', error)
@@ -79,30 +79,39 @@ export const useAuth = (): AuthHookProps => {
   }
 
   // Check if the token is expired
-  const isTokenExpired = (): boolean => {
-    const expiration = getTokenExpiration()
+  const isTokenExpired = (token: string | null): boolean => {
+    const expiration = getTokenExpiration(token)
     return expiration ? new Date() > expiration : true // Return true if expired or invalid
   }
 
+  const refreshTokenHandler = async (): Promise<void> => {
+    const tokenResponse: JwtRefreshDTO = await refreshTokenApi(authSession, refreshToken)
+
+    setAuthSession(tokenResponse.accessToken, refreshToken, {
+      email: tokenResponse?.email,
+      id: tokenResponse?.id
+    })
+  }
+
   useEffect(() => {
-    const expiration = getTokenExpiration()
+    if (!getTokenExpiration(refreshToken)) {
+      clearAuthSession()
+      return
+    }
+
+    const expiration = getTokenExpiration(authSession)
     if (!expiration) return
     const periodTimeToRefresh = 60000 // Refresh 1 minute before expiration
 
     const now = new Date()
     const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
 
-    if (timeUntilRefresh < periodTimeToRefresh) {
-      const timeoutId = setTimeout(async () => {
-        const tokenResponse: JwtRefreshDTO = await refreshTokenApi(authSession, refreshToken)
-
-        setAuthSession(tokenResponse.accessToken, refreshToken, {
-          email: tokenResponse?.email,
-          id: tokenResponse?.id
-        })
-      }, timeUntilRefresh)
+    if (timeUntilRefresh > 0) {
+      const timeoutId = setTimeout(refreshTokenHandler, timeUntilRefresh)
 
       return (): void => clearTimeout(timeoutId) // Cleanup timeout on component unmount or token change
+    } else {
+      refreshTokenHandler() // Immediate refresh
     }
 
     return undefined
@@ -113,7 +122,7 @@ export const useAuth = (): AuthHookProps => {
     refreshToken,
     setAuthSession,
     clearAuthSession,
-    isLoggedIn: Boolean(authSession) && !isTokenExpired(), // Boolean indicating if the user is logged in
+    isLoggedIn: Boolean(authSession) && !isTokenExpired(authSession), // Boolean indicating if the user is logged in
     userInformation: userInformation || null,
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
