@@ -1,13 +1,17 @@
-import { useCallback, useState } from 'react'
+import dayjs from 'dayjs'
+import { useCallback, useEffect, useState } from 'react'
+import { DragFromOutsideItemArgs } from 'react-big-calendar/lib/addons/dragAndDrop'
 
-import mockEvents from '../mockEvents'
+import { useUpdateTask } from '@/hooks/useTasks'
 
-interface CalendarEvent {
-  id: number
+export interface CalendarEvent {
+  id: string
   title: string
   start: Date
   end: Date
   allDay?: boolean
+  isDraggable?: boolean
+  taskStatus?: string
 }
 
 type EventInteractionArgs<T> = {
@@ -19,48 +23,188 @@ type EventInteractionArgs<T> = {
 
 export const useCalendarEvents = (): {
   events: CalendarEvent[]
+  draggedEvent: CalendarEvent | null
   setEvents: (events: CalendarEvent[]) => void
   updateEvent: (eventId: number, updates: Partial<CalendarEvent>) => void
   moveEvent: (args: EventInteractionArgs<object>) => void
   resizeEvent: (args: EventInteractionArgs<object>) => void
+  onDropFromOutside: (args: DragFromOutsideItemArgs) => void
 } => {
-  const [events, setEvents] = useState<CalendarEvent[]>(mockEvents)
+  const [events, setEvents] = useState<CalendarEvent[]>()
+  const { mutateAsync: updateTask } = useUpdateTask()
+  const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null)
 
-  const updateEvent = useCallback<(eventId: number, updates: Partial<CalendarEvent>) => void>((eventId, updates) => {
-    setEvents((prev) => prev.map((event) => (event.id === eventId ? { ...event, ...updates } : event)))
-  }, [])
+  useEffect(() => {
+    const draggedTask = localStorage.getItem('draggedTask')
+    setDraggedEvent(draggedTask ? JSON.parse(draggedTask) : null)
+  }, [localStorage.getItem('draggedTask')])
+
+  const determineTaskStatus = (start: Date, end: Date): string => {
+    const now = dayjs()
+    if (dayjs(end).isBefore(now)) return 'Expired'
+    if (dayjs(start).isBefore(now) && dayjs(end).isAfter(now)) return 'In Progress'
+    return 'Todo'
+  }
+
+  const updateEvent = useCallback<(eventId: string, updates: Partial<CalendarEvent>) => void>(
+    async (eventId, updates) => {
+      try {
+        const start = updates.start ? new Date(updates.start) : undefined
+        const end = updates.end ? new Date(updates.end) : undefined
+        const status = start && end ? determineTaskStatus(start, end) : undefined
+        // Update the task in the backend
+        await updateTask({
+          id: eventId,
+          task: {
+            startDate: start,
+            endDate: end,
+            status
+          }
+        })
+
+        // Update local state
+        setEvents((prev) =>
+          prev?.map((event) => (event.id === eventId ? { ...event, ...updates, taskStatus: status } : event))
+        )
+      } catch (error) {
+        console.error('Failed to update task:', error)
+        // You might want to add error handling/notification here
+      }
+    },
+    [updateTask]
+  )
 
   const moveEvent = useCallback<(args: EventInteractionArgs<object>) => void>(
-    ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
+    async ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
       const typedEvent = event as CalendarEvent
-      const { allDay } = typedEvent
-      if (!allDay && droppedOnAllDaySlot) {
-        typedEvent.allDay = true
-      }
-      if (allDay && !droppedOnAllDaySlot) {
-        typedEvent.allDay = false
-      }
+      const newAllDay = droppedOnAllDaySlot
 
-      setEvents((prev) => {
-        const existing = prev.find((ev) => ev.id === typedEvent.id) ?? {}
-        const filtered = prev.filter((ev) => ev.id !== typedEvent.id)
-        return [...filtered, { ...existing, start, end, allDay: typedEvent.allDay } as CalendarEvent]
-      })
+      try {
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const status = determineTaskStatus(startDate, endDate)
+
+        await updateTask({
+          id: typedEvent.id,
+          task: {
+            startDate,
+            endDate,
+            status
+          }
+        })
+
+        setEvents((prev) => {
+          const filtered = prev?.filter((ev) => ev.id !== typedEvent.id)
+          return [
+            ...(filtered || []),
+            {
+              ...typedEvent,
+              start: startDate,
+              end: endDate,
+              allDay: newAllDay,
+              taskStatus: status
+            }
+          ]
+        })
+      } catch (error) {
+        console.error('Failed to move task:', error)
+      }
     },
-    [setEvents]
+    [updateTask]
   )
 
   const resizeEvent = useCallback<(args: EventInteractionArgs<object>) => void>(
-    ({ event, start, end }) => {
+    async ({ event, start, end }) => {
       const typedEvent = event as CalendarEvent
-      setEvents((prev) => {
-        const existing = prev.find((ev) => ev.id === typedEvent.id) ?? {}
-        const filtered = prev.filter((ev) => ev.id !== typedEvent.id)
-        return [...filtered, { ...existing, start, end } as CalendarEvent]
-      })
+
+      try {
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const status = determineTaskStatus(startDate, endDate)
+
+        await updateTask({
+          id: typedEvent.id,
+          task: {
+            startDate,
+            endDate,
+            status
+          }
+        })
+
+        setEvents((prev) => {
+          const filtered = prev?.filter((ev) => ev.id !== typedEvent.id)
+          return [
+            ...(filtered || []),
+            {
+              ...typedEvent,
+              start: startDate,
+              end: endDate,
+              taskStatus: status
+            }
+          ]
+        })
+      } catch (error) {
+        console.error('Failed to resize task:', error)
+      }
     },
-    [setEvents]
+    [updateTask]
   )
 
-  return { events, setEvents, updateEvent, moveEvent, resizeEvent }
+  const onDropFromOutside = useCallback<(args: DragFromOutsideItemArgs) => void>(
+    async ({ start, end, allDay }) => {
+      try {
+        const draggedTask = JSON.parse(localStorage.getItem('draggedTask') || '{}')
+        if (!draggedTask._id) return
+
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const status = determineTaskStatus(startDate, endDate)
+        setDraggedEvent({
+          id: draggedTask._id,
+          title: draggedTask.name,
+          start: startDate,
+          end: endDate,
+          allDay,
+          taskStatus: status
+        })
+
+        await updateTask({
+          id: draggedTask._id,
+          task: {
+            startDate,
+            endDate,
+            status
+          }
+        })
+
+        setEvents((prev) => [
+          ...(prev || []),
+          {
+            id: draggedTask._id,
+            title: draggedTask.name,
+            start: startDate,
+            end: endDate,
+            allDay,
+            taskStatus: status
+          }
+        ])
+
+        setDraggedEvent(null)
+        localStorage.removeItem('draggedTask')
+      } catch (error) {
+        console.error('Failed to handle drop:', error)
+      }
+    },
+    [updateTask]
+  )
+
+  return {
+    events: events ?? [],
+    draggedEvent,
+    setEvents,
+    updateEvent: (eventId: number, updates) => updateEvent(String(eventId), updates),
+    moveEvent,
+    resizeEvent,
+    onDropFromOutside
+  }
 }
