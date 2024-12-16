@@ -1,0 +1,14 @@
+.scroll-bar-1::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scroll-bar-1::-webkit-scrollbar-track {
+  background-color: rgb(99, 99, 99);
+  opacity: 0.1 !important;
+}
+
+.scroll-bar-1::-webkit-scrollbar-thumb {
+  background: #151030;
+  border-radius: 20px;
+  animation: animate 2s infinite linear;
+}
