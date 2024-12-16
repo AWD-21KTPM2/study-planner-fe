@@ -19,11 +19,10 @@ const TaskPage: FC = () => {
   const [isEditTaskOpen, setIsEditTaskOpen] = useState<boolean>(false)
   const [editTaskId, setEditTaskId] = useState<string | null>(null)
   const { mutate: deleteTask } = useDeleteTask()
-  const [searchQuery, setSearchQuery] = useState<string>('') // State for search input
-  const [filterStatus, setFilterStatus] = useState<TaskStatus | null>(null) // State for status filter
-  const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null) // State for priority filter
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [filterStatus, setFilterStatus] = useState<TaskStatus | null>(null)
+  const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null)
 
-  // Filter tasks based on search, status, and priority
   const filteredTasks = tasks?.filter((task) => {
     const matchesSearch =
       task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
