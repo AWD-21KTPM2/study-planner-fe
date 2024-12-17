@@ -24,9 +24,13 @@ export const googleLogin = async (token: string): Promise<LoginResponse> => {
   }
 }
 
-export const getUserProfile = async (): Promise<UserInformation> => {
+export const getUserProfile = async (accessToken: string | null): Promise<UserInformation> => {
   try {
-    const response = await axiosClient.get(`user/profile`)
+    const response = await axiosClient.get(`user/profile`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    })
     return response.data
   } catch (error) {
     const errorData = (error as AxiosError<ErrorType>).response?.data.detail
