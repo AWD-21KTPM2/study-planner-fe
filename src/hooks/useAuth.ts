@@ -37,7 +37,7 @@ export const useAuth = (): AuthHookProps => {
   } = useQuery({
     queryKey: authKeys.profile,
     queryFn: async () => {
-      const response = await getUserProfile()
+      const response = await getUserProfile(authSession)
       return response
     },
     enabled: Boolean(authSession || localStorage.getItem('auth-data')),
@@ -93,28 +93,53 @@ export const useAuth = (): AuthHookProps => {
     })
   }
 
+  // useEffect(() => {
+  //   if (!getTokenExpiration(refreshToken)) {
+  //     clearAuthSession()
+  //     return
+  //   }
+
+  //   const expiration = getTokenExpiration(authSession)
+  //   if (!expiration) return
+  //   const periodTimeToRefresh = 60000 // Refresh 1 minute before expiration
+
+  //   const now = new Date()
+  //   const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
+
+  //   if (timeUntilRefresh > 0) {
+  //     // const timeoutId = setTimeout(refreshTokenHandler, timeUntilRefresh)
+  //     // return (): void => clearTimeout(timeoutId) // Cleanup timeout on component unmount or token change
+  //   } else {
+  //     // refreshTokenHandler() // Immediate refresh
+  //   }
+
+  //   return undefined
+  // }, [authSession])
+
   useEffect(() => {
-    if (!getTokenExpiration(refreshToken)) {
+    if (refreshToken && isTokenExpired(refreshToken)) {
       clearAuthSession()
       return
     }
 
     const expiration = getTokenExpiration(authSession)
     if (!expiration) return
-    const periodTimeToRefresh = 60000 // Refresh 1 minute before expiration
 
+    const periodTimeToRefresh = 60000 // 1 minute before expiration
     const now = new Date()
     const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
 
-    if (timeUntilRefresh > 0) {
-      const timeoutId = setTimeout(refreshTokenHandler, timeUntilRefresh)
+    let timeoutId: NodeJS.Timeout
 
-      return (): void => clearTimeout(timeoutId) // Cleanup timeout on component unmount or token change
+    if (timeUntilRefresh > 0) {
+      timeoutId = setTimeout(refreshTokenHandler, timeUntilRefresh)
     } else {
-      refreshTokenHandler() // Immediate refresh
+      refreshTokenHandler()
     }
 
-    return undefined
+    return (): void => {
+      if (timeoutId) clearTimeout(timeoutId) // Cleanup timeout
+    }
   }, [authSession])
 
   return {
@@ -132,10 +157,12 @@ export const useAuth = (): AuthHookProps => {
 }
 
 export const useProfile = (): UseQueryResult<UserInformation, Error> => {
+  const { authSession } = useAuthStore()
+
   return useQuery({
     queryKey: authKeys.profile,
     queryFn: async () => {
-      const response = await getUserProfile()
+      const response = await getUserProfile(authSession)
       return response
     },
     enabled: Boolean(localStorage.getItem('auth-data'))
