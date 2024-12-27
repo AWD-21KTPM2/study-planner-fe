@@ -9,7 +9,7 @@ const ResetPassword: React.FC = () => {
 
   const onSubmit = async (data: { newPassword: string }): Promise<void> => {
     try {
-      await axios.post('/api/user/reset-password', { token, ...data })
+      await axios.post('http://localhost:3000/user/reset-password', { token, ...data })
       alert('Password has been reset successfully!')
     } catch {
       alert('Error resetting password')
