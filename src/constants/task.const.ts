@@ -39,3 +39,21 @@ export const taskStatusColorMap = {
   [TaskStatus.COMPLETED]: 'green',
   [TaskStatus.EXPIRED]: 'red'
 }
+
+export const TASK_STYLES = {
+  SCHEDULED: {
+    backgroundColor: 'bg-gray-50',
+    hoverBackground: 'hover:bg-gray-100',
+    border: ''
+  },
+  UNSCHEDULED: {
+    backgroundColor: 'bg-gray-50',
+    hoverBackground: 'hover:bg-gray-100',
+    border: 'border-l-4 border-l-warning',
+    opacity: 'opacity-50'
+  }
+} as const
+
+export const TASK_LIST_DEFAULTS = {
+  DEFAULT_LIMIT: 5
+} as const

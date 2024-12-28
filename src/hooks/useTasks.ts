@@ -1,57 +1,48 @@
-import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query'
+import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query'
 import { message } from 'antd'
+import dayjs from 'dayjs'
 
 import { Task } from '@/types/task.type'
 import { createTask, deleteTask, getTaskById, getTasksByUserId, updateTask } from '@/utils/apis/task-apis.util'
-import queryClient from '@/utils/query-client.util'
 
+// Centralized query keys for better type safety and reusability
 export const taskKeys = {
   all: ['tasks'] as const,
+  lists: () => [...taskKeys.all, 'list'] as const,
   detail: (id: string) => [...taskKeys.all, 'detail', id] as const
 }
 
 export const useTasks = (): UseQueryResult<Task[], Error> => {
   return useQuery({
-    queryKey: taskKeys.all,
-    refetchInterval: 1000 * 30, // 30 seconds
+    queryKey: taskKeys.lists(),
     queryFn: async () => {
-      try {
-        const response = await getTasksByUserId()
-        return response.data?.tasks
-      } catch (error) {
-        console.error(error)
-        throw error
-      }
+      const response = await getTasksByUserId()
+      return response.data?.tasks ?? []
     },
+    refetchInterval: 1000 * 30, // 30 seconds
     refetchOnMount: true,
     refetchOnWindowFocus: true,
-    staleTime: 0,
-    // Add these options to ensure updates are visible
     refetchOnReconnect: true,
-    retry: true,
-    // This ensures the data is always fresh when the component mounts
-    initialDataUpdatedAt: 0
+    staleTime: 0 // Consider data stale immediately
   })
 }
+
 export const useCreateTask = (): UseMutationResult<Task | undefined, Error, Task> => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (task: Task) => {
       const response = await createTask(task)
       return response.data
     },
     onSuccess: async (newTask) => {
-      // Get current tasks from cache
-      const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.all) || []
-      // Update the cache with the new task
       if (newTask) {
-        queryClient.setQueryData<Task[]>(taskKeys.all, [...previousTasks, newTask])
-      }
+        // Optimistic update for immediate UI feedback
+        const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.lists()) || []
+        queryClient.setQueryData<Task[]>(taskKeys.lists(), [...previousTasks, newTask])
 
-      // Then invalidate to ensure fresh data
-      await queryClient.invalidateQueries({
-        queryKey: taskKeys.all,
-        exact: true
-      })
+        // Invalidate and refetch
+        await queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
+      }
 
       message.success({
         content: 'Task created successfully',
@@ -59,73 +50,108 @@ export const useCreateTask = (): UseMutationResult<Task | undefined, Error, Task
         duration: 2
       })
     },
-    retry: 3,
-    retryDelay: 1000
+    onError: (error: Error) => {
+      message.error('Failed to create task. Please try again.')
+      console.error('Create task error:', error)
+    }
   })
 }
+
 export const useUpdateTask = (): UseMutationResult<Task | undefined, Error, { id: string; task: Partial<Task> }> => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async ({ id, task }) => {
+      if (task.startDate && task.endDate) {
+        // check if estimated time is not match with start and end date
+        if (task.estimatedTime !== dayjs(task.endDate).diff(dayjs(task.startDate), 'minute')) {
+          message.warning({
+            content:
+              'Estimated time does not match with start and end date, we will update the estimated time to match with start and end date',
+            key: 'estimated-time-mismatch',
+            duration: 2
+          })
+          task.estimatedTime = dayjs(task.endDate).diff(dayjs(task.startDate), 'minute')
+        }
+      }
+
       const response = await updateTask(id, task)
       return response.data
     },
-    onSuccess: (_, variables) => {
-      // Invalidate both the specific task and the task list
-      queryClient.invalidateQueries({ queryKey: taskKeys.detail(variables.id) })
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+    onMutate: async ({ id, task }) => {
+      // Cancel any outgoing refetches to avoid overwriting optimistic update
+      await queryClient.cancelQueries({ queryKey: taskKeys.lists() })
+      await queryClient.cancelQueries({ queryKey: taskKeys.detail(id) })
 
+      // Snapshot current state
+      const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.lists())
+
+      // Optimistically update the cache
+      if (previousTasks) {
+        queryClient.setQueryData<Task[]>(
+          taskKeys.lists(),
+          previousTasks.map((t) => (t._id === id ? { ...t, ...task } : t))
+        )
+      }
+
+      return { previousTasks }
+    },
+    onSettled: async (_, error, variables) => {
+      // Invalidate both queries to trigger refetch
+      await queryClient.invalidateQueries({
+        queryKey: taskKeys.lists(),
+        refetchType: 'all'
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: taskKeys.detail(variables?.id),
+        refetchType: 'all'
+      })
+    },
+    onSuccess: async () => {
       message.success({
         content: 'Task updated successfully',
         key: 'update-task',
         duration: 2
       })
     },
-    // Optional: Add optimistic update
-    onMutate: async ({ id, task }) => {
-      // Cancel any outgoing refetches
-      await queryClient.cancelQueries({ queryKey: taskKeys.detail(id) })
-      await queryClient.cancelQueries({ queryKey: taskKeys.all })
-
-      // Snapshot the previous value
-      const previousTask = queryClient.getQueryData<Task>(taskKeys.detail(id))
-      const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.all)
-
-      // Optimistically update the cache
-      if (previousTask) {
-        queryClient.setQueryData<Task>(taskKeys.detail(id), {
-          ...previousTask,
-          ...task
-        })
-      }
-
-      if (previousTasks) {
-        queryClient.setQueryData<Task[]>(
-          taskKeys.all,
-          previousTasks.map((t) => (t._id === id ? { ...t, ...task } : t))
-        )
-      }
-
-      return { previousTask, previousTasks }
-    },
-    onError: (err, { id }, context) => {
-      // Rollback on error
-      if (context?.previousTask) {
-        queryClient.setQueryData(taskKeys.detail(id), context.previousTask)
-      }
+    onError: (error: Error, _, context) => {
+      // Revert optimistic update on error
       if (context?.previousTasks) {
-        queryClient.setQueryData(taskKeys.all, context.previousTasks)
+        queryClient.setQueryData(taskKeys.lists(), context.previousTasks)
       }
+      message.error('Failed to update task. Please try again.')
+      console.error('Update task error:', error)
     }
   })
 }
 
 export const useDeleteTask = (): UseMutationResult<void, Error, string> => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
       await deleteTask(id)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: taskKeys.all })
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: taskKeys.lists() })
+      const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.lists())
+
+      // Optimistic delete
+      if (previousTasks) {
+        queryClient.setQueryData<Task[]>(
+          taskKeys.lists(),
+          previousTasks.filter((task) => task._id !== id)
+        )
+      }
+
+      return { previousTasks }
+    },
+    onSuccess: async () => {
+      // Invalidate to trigger refetch
+      await queryClient.invalidateQueries({
+        queryKey: taskKeys.lists(),
+        refetchType: 'all'
+      })
 
       message.success({
         content: 'Task deleted successfully',
@@ -133,26 +159,12 @@ export const useDeleteTask = (): UseMutationResult<void, Error, string> => {
         duration: 2
       })
     },
-    // Optional: Add optimistic update
-    onMutate: async (id) => {
-      await queryClient.cancelQueries({ queryKey: taskKeys.all })
-
-      const previousTasks = queryClient.getQueryData<Task[]>(taskKeys.all)
-
-      if (previousTasks) {
-        queryClient.setQueryData<Task[]>(
-          taskKeys.all,
-          previousTasks.filter((task) => task._id !== id)
-        )
-      }
-
-      return { previousTasks }
-    },
-    onError: (_, __, context) => {
-      // Rollback on error
+    onError: (error: Error, _, context) => {
       if (context?.previousTasks) {
-        queryClient.setQueryData(taskKeys.all, context.previousTasks)
+        queryClient.setQueryData(taskKeys.lists(), context.previousTasks)
       }
+      message.error('Failed to delete task. Please try again.')
+      console.error('Delete task error:', error)
     }
   })
 }
@@ -163,6 +175,10 @@ export const useTask = (id: string): UseQueryResult<Task | undefined, Error> => 
     queryFn: async () => {
       const response = await getTaskById(id)
       return response.data?.tasks[0]
-    }
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 0 // Consider data stale immediately
   })
 }

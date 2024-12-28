@@ -1,8 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useCallback, useEffect, useState } from 'react'
 import { DragFromOutsideItemArgs } from 'react-big-calendar/lib/addons/dragAndDrop'
 
-import { useUpdateTask } from '@/hooks/useTasks'
+import { taskKeys, useTasks, useUpdateTask } from '@/hooks/useTasks'
+import { Task } from '@/types/task.type'
 
 export interface CalendarEvent {
   id: string
@@ -29,10 +31,14 @@ export const useCalendarEvents = (): {
   moveEvent: (args: EventInteractionArgs<object>) => void
   resizeEvent: (args: EventInteractionArgs<object>) => void
   onDropFromOutside: (args: DragFromOutsideItemArgs) => void
+  isPending: boolean
 } => {
+  const { data: tasks } = useTasks()
   const [events, setEvents] = useState<CalendarEvent[]>()
-  const { mutateAsync: updateTask } = useUpdateTask()
+  const { mutateAsync: updateTask, isPending } = useUpdateTask()
   const [draggedEvent, setDraggedEvent] = useState<CalendarEvent | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const draggedTask = localStorage.getItem('draggedTask')
@@ -46,9 +52,31 @@ export const useCalendarEvents = (): {
     return 'Todo'
   }
 
+  useEffect(() => {
+    if (!tasks) return
+
+    const convertTaskToEvent = (task: Task): CalendarEvent | null => {
+      if (!task.startDate || !task.endDate || !task._id) return null
+
+      return {
+        id: task._id,
+        title: task.name,
+        start: dayjs(task.startDate).toDate(),
+        end: dayjs(task.endDate).toDate(),
+        isDraggable: task.status !== 'Completed',
+        taskStatus: task.status
+      }
+    }
+
+    const validEvents = tasks.map(convertTaskToEvent).filter((event): event is CalendarEvent => event !== null)
+
+    setEvents(validEvents)
+  }, [tasks, setEvents])
+
   const updateEvent = useCallback<(eventId: string, updates: Partial<CalendarEvent>) => void>(
     async (eventId, updates) => {
       try {
+        setIsLoading(true)
         const start = updates.start ? new Date(updates.start) : undefined
         const end = updates.end ? new Date(updates.end) : undefined
         const status = start && end ? determineTaskStatus(start, end) : undefined
@@ -69,6 +97,8 @@ export const useCalendarEvents = (): {
       } catch (error) {
         console.error('Failed to update task:', error)
         // You might want to add error handling/notification here
+      } finally {
+        setIsLoading(false)
       }
     },
     [updateTask]
@@ -80,19 +110,12 @@ export const useCalendarEvents = (): {
       const newAllDay = droppedOnAllDaySlot
 
       try {
+        setIsLoading(true)
         const startDate = new Date(start)
         const endDate = new Date(end)
         const status = determineTaskStatus(startDate, endDate)
 
-        await updateTask({
-          id: typedEvent.id,
-          task: {
-            startDate,
-            endDate,
-            status
-          }
-        })
-
+        // Optimistic update first
         setEvents((prev) => {
           const filtered = prev?.filter((ev) => ev.id !== typedEvent.id)
           return [
@@ -106,22 +129,8 @@ export const useCalendarEvents = (): {
             }
           ]
         })
-      } catch (error) {
-        console.error('Failed to move task:', error)
-      }
-    },
-    [updateTask]
-  )
 
-  const resizeEvent = useCallback<(args: EventInteractionArgs<object>) => void>(
-    async ({ event, start, end }) => {
-      const typedEvent = event as CalendarEvent
-
-      try {
-        const startDate = new Date(start)
-        const endDate = new Date(end)
-        const status = determineTaskStatus(startDate, endDate)
-
+        // Then update the backend
         await updateTask({
           id: typedEvent.id,
           task: {
@@ -131,6 +140,46 @@ export const useCalendarEvents = (): {
           }
         })
 
+        // Force a refetch to ensure consistency
+        await queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
+      } catch (error) {
+        console.error('Failed to move task:', error)
+        // Revert the optimistic update on error
+        if (tasks) {
+          const originalEvent = tasks.find((t) => t._id === typedEvent.id)
+          if (originalEvent && originalEvent.startDate && originalEvent.endDate) {
+            setEvents((prev) =>
+              prev?.map((ev) =>
+                ev.id === typedEvent.id
+                  ? {
+                      ...ev,
+                      start: originalEvent.startDate ? new Date(originalEvent.startDate) : new Date(),
+                      end: originalEvent.endDate ? new Date(originalEvent.endDate) : new Date(),
+                      taskStatus: originalEvent.status
+                    }
+                  : ev
+              )
+            )
+          }
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [updateTask, tasks]
+  )
+
+  const resizeEvent = useCallback<(args: EventInteractionArgs<object>) => void>(
+    async ({ event, start, end }) => {
+      const typedEvent = event as CalendarEvent
+
+      try {
+        setIsLoading(true)
+        const startDate = new Date(start)
+        const endDate = new Date(end)
+        const status = determineTaskStatus(startDate, endDate)
+
+        // Optimistic update first
         setEvents((prev) => {
           const filtered = prev?.filter((ev) => ev.id !== typedEvent.id)
           return [
@@ -143,17 +192,51 @@ export const useCalendarEvents = (): {
             }
           ]
         })
+
+        // Then update the backend
+        await updateTask({
+          id: typedEvent.id,
+          task: {
+            startDate,
+            endDate,
+            status
+          }
+        })
+
+        // Force a refetch to ensure consistency
+        await queryClient.invalidateQueries({ queryKey: taskKeys.lists() })
       } catch (error) {
         console.error('Failed to resize task:', error)
+        // Revert the optimistic update on error
+        if (tasks) {
+          const originalEvent = tasks.find((t) => t._id === typedEvent.id)
+          if (originalEvent && originalEvent.startDate && originalEvent.endDate) {
+            setEvents((prev) =>
+              prev?.map((ev) =>
+                ev.id === typedEvent.id
+                  ? {
+                      ...ev,
+                      start: originalEvent.startDate ? new Date(originalEvent.startDate) : new Date(),
+                      end: originalEvent.endDate ? new Date(originalEvent.endDate) : new Date(),
+                      taskStatus: originalEvent.status
+                    }
+                  : ev
+              )
+            )
+          }
+        }
+      } finally {
+        setIsLoading(false)
       }
     },
-    [updateTask]
+    [updateTask, tasks]
   )
 
   const onDropFromOutside = useCallback<(args: DragFromOutsideItemArgs) => void>(
     async ({ start, end, allDay }) => {
       try {
-        const draggedTask = JSON.parse(localStorage.getItem('draggedTask') || '{}')
+        setIsLoading(true)
+        const draggedTask = JSON.parse(localStorage.getItem('draggedTask') ?? '{}')
         if (!draggedTask._id) return
 
         const startDate = new Date(start)
@@ -193,6 +276,8 @@ export const useCalendarEvents = (): {
         localStorage.removeItem('draggedTask')
       } catch (error) {
         console.error('Failed to handle drop:', error)
+      } finally {
+        setIsLoading(false)
       }
     },
     [updateTask]
@@ -205,6 +290,7 @@ export const useCalendarEvents = (): {
     updateEvent: (eventId: number, updates) => updateEvent(String(eventId), updates),
     moveEvent,
     resizeEvent,
-    onDropFromOutside
+    onDropFromOutside,
+    isPending: isLoading && isPending
   }
 }
