@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { ROUTE } from '@/constants/route.const'
 import ForgotPassword from '@/pages/forgot-password/ForgotPassword'
 import Home from '@/pages/home/Home'
+import LandingPage from '@/pages/home/LandingPage'
 import Login from '@/pages/login/Login'
 import RenderMain from '@/pages/main/RenderMain'
 import NotFound from '@/pages/not-found/NotFound'
@@ -22,6 +23,14 @@ export const router = createBrowserRouter([
         element: (
           <PublicRoute>
             <Login />
+          </PublicRoute>
+        )
+      },
+      {
+        path: ROUTE.GUEST,
+        element: (
+          <PublicRoute>
+            <LandingPage />
           </PublicRoute>
         )
       },
