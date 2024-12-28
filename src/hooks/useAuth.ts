@@ -7,7 +7,6 @@ import { DecodedJwtToken, JwtRefreshDTO } from '@/types/user.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
 import { refreshTokenApi } from '@/utils/apis/auth-apis.util'
 import { getUserProfile, login } from '@/utils/apis/user-apis.util'
-import queryClient from '@/utils/query-client.util'
 
 interface AuthHookProps extends AuthState {
   isLoggedIn: boolean
@@ -148,6 +147,7 @@ export const useProfile = (): UseQueryResult<UserInformation, Error> => {
 
 export const useLogin = (): UseMutationResult<LoginResponse, Error, UserDTO> => {
   const { setAuthSession } = useAuthStore()
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: login,
     onSuccess: (response) => {

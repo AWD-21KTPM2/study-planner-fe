@@ -4,7 +4,7 @@ import { BarChartOutlined, CheckSquareOutlined, RobotOutlined } from '@ant-desig
 import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
 
-import DragnDropCalendar from '@/components/calendar/DragnDropCalendar'
+import DragAndDropCalendar from '@/components/calendar/DragAndDropCalendar'
 import CommonModal from '@/components/modal/CommonModal'
 import { useAuth } from '@/hooks/useAuth'
 import { useTasks } from '@/hooks/useTasks'
@@ -82,8 +82,8 @@ const Home = (): React.ReactNode => {
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={18}>
           <Card title='Schedule' extra={<Button type='link'>Analyze Schedule </Button>}>
-            <div className='flex justify-center items-center bg-gray-100 rounded min-w-full h-96 --calendar-section'>
-              <DragnDropCalendar />
+            <div className='flex justify-center items-center rounded min-w-full --calendar-section'>
+              <DragAndDropCalendar className='min-w-full' />
             </div>
           </Card>
         </Col>
@@ -103,7 +103,7 @@ const Home = (): React.ReactNode => {
                 description={<Typography.Text>Task not found</Typography.Text>}
               />
             ) : (
-              <div className='h-[43rem] overflow-y-auto'>
+              <div className='--calendar-section'>
                 <TaskList task_list={tasks} limit={tasks.length} />
               </div>
             )}
