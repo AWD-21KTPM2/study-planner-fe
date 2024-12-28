@@ -120,12 +120,7 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
     [task]
   )
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm<EditTaskFormData>({
+  const { control, handleSubmit, reset } = useForm<EditTaskFormData>({
     resolver: zodResolver(newTaskSchema),
     defaultValues
   })
