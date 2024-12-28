@@ -78,6 +78,55 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Testimonial Section */}
+      <section className='bg-white py-12'>
+        <div className='container mx-auto text-center'>
+          <h2 className='text-3xl font-bold mb-6'>What Our Users Say</h2>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+              <p className='text-gray-600 mb-4'>
+                &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
+                on!&quot;
+              </p>
+              <h4 className='font-bold text-lg'>- Alex M.</h4>
+            </div>
+            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+              <p className='text-gray-600 mb-4'>
+                &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
+              </p>
+              <h4 className='font-bold text-lg'>- Sarah L.</h4>
+            </div>
+            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+              <p className='text-gray-600 mb-4'>
+                &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
+              </p>
+              <h4 className='font-bold text-lg'>- Michael T.</h4>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className='bg-gray-100 py-12'>
+        <div className='container mx-auto text-center'>
+          <h2 className='text-3xl font-bold mb-6'>How It Works</h2>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
+            <div className='p-6 bg-white shadow-md rounded-md'>
+              <h3 className='text-2xl font-bold mb-4'>Step 1</h3>
+              <p className='text-gray-600'>Sign up and create your profile to get started.</p>
+            </div>
+            <div className='p-6 bg-white shadow-md rounded-md'>
+              <h3 className='text-2xl font-bold mb-4'>Step 2</h3>
+              <p className='text-gray-600'>Add your tasks and organize them on the calendar.</p>
+            </div>
+            <div className='p-6 bg-white shadow-md rounded-md'>
+              <h3 className='text-2xl font-bold mb-4'>Step 3</h3>
+              <p className='text-gray-600'>Use AI feedback and analytics to optimize your learning.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Call to Action Section */}
       <section className='bg-blue-600 text-white py-12'>
         <div className='container mx-auto text-center'>
