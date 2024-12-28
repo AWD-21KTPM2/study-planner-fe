@@ -119,9 +119,28 @@ const Login: React.FC = () => {
             />
           </FormItem>
 
+          {/* <div className='text-right'>
+            <Button type='link' onClick={() => navigate('/forgot-password')} className='text-blue-500 hover:underline'>
+              Forgot Password?
+            </Button>
+          </div>
+
           <FormItem name='rememberMe' control={control} className='flex justify-start'>
             <Checkbox>Remember me</Checkbox>
-          </FormItem>
+          </FormItem> */}
+
+          <div className='flex justify-between'>
+            <FormItem name='rememberMe' control={control} className='flex justify-start'>
+              <Checkbox>Remember me</Checkbox>
+            </FormItem>
+            <Button
+              type='link'
+              onClick={() => navigate('/forgot-password')}
+              className='text-blue-500 hover:underline border-none'
+            >
+              Forgot Password?
+            </Button>
+          </div>
 
           <Button
             type='primary'

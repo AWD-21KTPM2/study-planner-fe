@@ -5,5 +5,7 @@ export const ROUTE = {
   REGISTER: '/register',
   PROFILE: '/profile',
   TASKS: '/tasks',
+  FORGOTPASSWORD: '/forgot-password',
+  RESETPASSWORD: '/reset-password/:token',
   NOT_FOUND: '/404'
 }
