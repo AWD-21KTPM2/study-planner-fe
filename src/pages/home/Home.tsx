@@ -1,7 +1,7 @@
 import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, RobotOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Empty, Row, Spin, Typography } from 'antd'
+import { Button, Card, Col, Collapse, CollapseProps, Empty, Row, Spin, Typography } from 'antd'
 import React, { useRef, useState } from 'react'
 
 import DragAndDropCalendar from '@/components/calendar/DragAndDropCalendar'
@@ -13,6 +13,7 @@ import { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
 
 import TaskAnalysisTable, { DataProps } from '../ai-generate/TaskAnalysisTable'
+import UserProgress from '../user-progress/UserProgress'
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
 import TaskList from './TaskList'
@@ -41,13 +42,20 @@ const Home = (): React.ReactNode => {
     setTaskAnalysis([])
   }
 
+  const items: CollapseProps['items'] = [
+    {
+      key: '1',
+      label: <b>Task Insights</b>,
+      children: <UserProgress />
+    }
+  ]
+
   return (
     <div className='mx-auto --home-section'>
       {isLoading && <Spin fullscreen />}
-
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='Add New Task'
             description='Create a study task'
@@ -58,7 +66,7 @@ const Home = (): React.ReactNode => {
             }}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='View Progress'
             description='Check your study progress'
@@ -67,7 +75,7 @@ const Home = (): React.ReactNode => {
             action={() => {}}
           />
         </Col>
-        <Col xs={24} md={8}>
+        <Col xs={24} md={6}>
           <ActionCard
             title='Analyze Schedule'
             description='Analyze your study schedule with AI'
@@ -76,7 +84,19 @@ const Home = (): React.ReactNode => {
             action={analyzeTaskHandler}
           />
         </Col>
+        <Col xs={24} md={6}>
+          <ActionCard
+            title='AI feedback'
+            description='Give feedback about my tasks'
+            className='bg-blue-50 hover:bg-blue-200 shadow-md'
+            icon={<RobotOutlined className='text-2xl text-blue-600' />}
+            action={analyzeTaskHandler}
+          />
+        </Col>
       </Row>
+
+      {/* Collapse for insights */}
+      <Collapse items={items} defaultActiveKey={['1']} className='mb-5' />
 
       {/* Calendar and Tasks */}
       <Row gutter={[16, 16]}>
@@ -110,7 +130,6 @@ const Home = (): React.ReactNode => {
           </Card>
         </Col>
       </Row>
-
       <CommonModal title='AI Analysis' width={1000} ref={refAnalyzeModal} handleCancel={analyzeTaskCancel}>
         {isLoadingAnalyzes ? (
           <div className='flex justify-center w-full'>

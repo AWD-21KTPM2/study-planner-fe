@@ -90,6 +90,7 @@ export const useAuth = (): AuthHookProps => {
       email: tokenResponse?.email,
       id: tokenResponse?.id
     })
+    console.log('triggered refresh token')
   }
 
   useEffect(() => {
@@ -104,6 +105,8 @@ export const useAuth = (): AuthHookProps => {
     const periodTimeToRefresh = 60000 // 1 minute before expiration
     const now = new Date()
     const timeUntilRefresh = expiration.getTime() - now.getTime() - periodTimeToRefresh
+
+    console.log('Time until refresh:', timeUntilRefresh)
 
     let timeoutId: NodeJS.Timeout
 
