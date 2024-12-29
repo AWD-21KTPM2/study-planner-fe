@@ -9,6 +9,7 @@ import PublicRoute from './PublicRoute'
 const FocusTimer = lazy(() => import('@/pages/focus-timer/FocusTimer'))
 const Home = lazy(() => import('@/pages/home/Home'))
 const Login = lazy(() => import('@/pages/login/Login'))
+const LandingPage = lazy(() => import('@/pages/home/LandingPage'))
 const RenderMain = lazy(() => import('@/pages/main/RenderMain'))
 const NotFound = lazy(() => import('@/pages/not-found/NotFound'))
 const Profile = lazy(() => import('@/pages/profile/Profile'))
