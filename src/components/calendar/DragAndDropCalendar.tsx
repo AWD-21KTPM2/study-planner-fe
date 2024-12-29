@@ -1,10 +1,9 @@
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
-import { message, Spin } from 'antd'
+import { Spin } from 'antd'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
-import { useEffect } from 'react'
 import { Calendar, DateLocalizer, dayjsLocalizer, Views } from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
 
@@ -37,7 +36,7 @@ const DragAndDropCalendar = ({
   className = 'w-full h-full'
 }: DragAndDropCalendarProps): JSX.Element => {
   const { data: tasks } = useTasks()
-  const { events, setEvents, moveEvent, resizeEvent, onDropFromOutside, draggedEvent, isPending } = useCalendarEvents()
+  const { events, moveEvent, resizeEvent, onDropFromOutside, draggedEvent, isPending } = useCalendarEvents()
 
   const { eventPropGetter } = useEventStyles(tasks)
   const { handleSelectEvent, handleCloseEditModal, isEditModalOpen, selectedTaskId, dragAndDropProps } =

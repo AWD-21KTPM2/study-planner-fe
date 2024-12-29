@@ -1,4 +1,4 @@
-import { Tag, Tooltip } from 'antd'
+import { Tooltip } from 'antd'
 import { FC, PropsWithChildren } from 'react'
 
 interface TaskStatusProps extends PropsWithChildren {
