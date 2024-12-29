@@ -7,7 +7,7 @@ export function roundDecimalPercent(a: number, b: number): number {
 
 export function formatAIGenerateFeedback(feedback: string): string {
   return feedback
-    .replace(/\*\*([^*]+?)\*\* \*/g, "<h3 class='!text-base !font-bold !text-rose-700 !mt-2'>$1</h3>")
-    .replace(/\*\*([^*]+?)\*\*/g, "<h4 class='!text-base !font-bold mt-2'>$1</h4>") // Replace **text** with <h4>
+    .replace(/\*\*([^*]+?)\*\*\n/g, "<h3 class='!text-base !font-bold !text-rose-700 !mt-2'>$1</h3>")
+    .replace(/\* \*\*([^*]+?)\*\*/g, "<h4 class='!text-base !font-bold mt-2'>$1</h4>") // Replace **text** with <h4>
     .replace(/\*/g, '') // Remove stray * characters // Close the div for each point
 }
