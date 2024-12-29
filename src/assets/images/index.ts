@@ -7,9 +7,9 @@ import seamlessSchedulingImage from './seamless_scheduling.png'
 import step1Image from './sign_up.jpg'
 import taskManagementImage from './task_management.png'
 import step3Image from './use_ai_feedback.png'
-import userTestimonial1Image from './user1.jpg'
 import userTestimonial2Image from './user2.jpg'
 import userTestimonial3Image from './user3.jpg'
+import userTestimonial1Image from './user4.jpg'
 
 export {
   aiSuggestionsImage,
