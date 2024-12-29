@@ -162,6 +162,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
+import { taskManagementImage } from '@/assets/images'
+
 const LandingPage: React.FC = () => {
   return (
     <div className='min-h-screen bg-gray-100 text-gray-800'>
@@ -207,11 +209,8 @@ const LandingPage: React.FC = () => {
       <section className='bg-gray-100 py-12'>
         <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
           <div className='p-6 bg-white shadow-md rounded-md'>
-            <img
-              src='/path-to-your-image1.jpg'
-              alt='Task Management'
-              className='w-full h-40 object-cover mb-4 rounded-md'
-            />
+            <img src={taskManagementImage} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
+
             <h3 className='text-2xl font-bold mb-4'>Task Management</h3>
             <p className='text-gray-600'>
               Organize your tasks efficiently with priority levels, status updates, and detailed descriptions.
@@ -219,7 +218,7 @@ const LandingPage: React.FC = () => {
           </div>
           <div className='p-6 bg-white shadow-md rounded-md'>
             <img
-              src='/path-to-your-image2.jpg'
+              src='../assets/images/task_management.png'
               alt='AI Suggestions'
               className='w-full h-40 object-cover mb-4 rounded-md'
             />
