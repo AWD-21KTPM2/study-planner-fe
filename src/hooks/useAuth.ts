@@ -90,7 +90,7 @@ export const useAuth = (): AuthHookProps => {
       email: tokenResponse?.email,
       id: tokenResponse?.id
     })
-    // console.log('triggered refresh token')
+    console.log('triggered refresh token')
   }
 
   useEffect(() => {
