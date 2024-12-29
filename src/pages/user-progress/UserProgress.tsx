@@ -2,7 +2,7 @@ import type { ProgressProps } from 'antd'
 import { Flex, Progress, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 
-import { getTimeProgress, TimerProgressResponse } from '@/utils/apis/insights-apis.util'
+import { TimerProgressResponse } from '@/utils/apis/insights-apis.util'
 import { roundDecimalPercent } from '@/utils/common.util'
 
 const twoColors: ProgressProps['strokeColor'] = {
@@ -22,29 +22,6 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
   const [inProgressTasks, setInProgressTasks] = useState<number>(1)
   const [expiredTasks, setExpiredTasks] = useState<number>(1)
   const [todoTasks, setTodoTasks] = useState<number>(1)
-  const [userProgressData, setUserProgressData] = useState<TimerProgressResponse>()
-
-  // useEffect(() => {
-  //   const timeoutTimer = setInterval(async () => {
-  //     const response = await getTimeProgress()
-  //     setUserProgressData(response.data)
-  //   }, 100)
-
-  //   return (): void => {
-  //     clearInterval(timeoutTimer)
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   if (userProgressData) {
-  //     setTimeRate(parseFloat(userProgressData.totalProductivity))
-  //     setTotalTasks(userProgressData.totalTasks)
-  //     setCompletedTasks(userProgressData.countCompletedTasks)
-  //     setInProgressTasks(userProgressData.countInProgressTasks)
-  //     setExpiredTasks(userProgressData.countExpiredTasks)
-  //     setTodoTasks(userProgressData.countTodoTasks)
-  //   }
-  // }, [userProgressData])
 
   useEffect(() => {
     if (_dataSource) {
