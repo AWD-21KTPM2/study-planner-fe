@@ -70,7 +70,7 @@ const CommonLayout = (): React.ReactNode => {
         </div>
       </Header>
 
-      <Content className='bg-gray-50 p-4 md:p-6 lg:p-8'>
+      <Content className='flex bg-gray-50 p-4 md:p-6 lg:p-8'>
         <Outlet />
       </Content>
     </Layout>

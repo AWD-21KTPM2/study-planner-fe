@@ -1,7 +1,11 @@
 .--home-section {
   max-width: 110rem;
+  flex: 1;
 
   .--calendar-section {
     height: 50rem;
   }
+}
+.rbc-month-view, .rbc-time-view{
+  border-radius: 0.25rem;
 }

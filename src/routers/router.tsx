@@ -1,18 +1,30 @@
+import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
+import LazyComponent from '@/components/common/LazyComponent'
 import { ROUTE } from '@/constants/route.const'
-import ForgotPassword from '@/pages/forgot-password/ForgotPassword'
-import Home from '@/pages/home/Home'
-import LandingPage from '@/pages/home/LandingPage'
-import Login from '@/pages/login/Login'
-import RenderMain from '@/pages/main/RenderMain'
-import NotFound from '@/pages/not-found/NotFound'
-import Profile from '@/pages/profile/Profile'
-import ResetPassword from '@/pages/reset-password/ResetPassword'
-import Register from '@/pages/sign-up/Register'
-import Tasks from '@/pages/tasks'
 
 import PublicRoute from './PublicRoute'
+
+const FocusTimer = lazy(() => import('@/pages/focus-timer/FocusTimer'))
+const Home = lazy(() => import('@/pages/home/Home'))
+const Login = lazy(() => import('@/pages/login/Login'))
+const RenderMain = lazy(() => import('@/pages/main/RenderMain'))
+const NotFound = lazy(() => import('@/pages/not-found/NotFound'))
+const Profile = lazy(() => import('@/pages/profile/Profile'))
+const Register = lazy(() => import('@/pages/sign-up/Register'))
+const Tasks = lazy(() => import('@/pages/tasks'))
+const ForgotPassword = lazy(() => import('@/pages/forgot-password/ForgotPassword'))
+const ResetPassword = lazy(() => import('@/pages/reset-password/ResetPassword'))
+
+const wrapWithLazy = (Component: React.ComponentType, isPublic = false): JSX.Element => {
+  const wrapped = (
+    <LazyComponent>
+      <Component />
+    </LazyComponent>
+  )
+  return isPublic ? <PublicRoute>{wrapped}</PublicRoute> : wrapped
+}
 
 export const router = createBrowserRouter([
   {
@@ -20,11 +32,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: ROUTE.LOGIN,
-        element: (
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        )
+        element: wrapWithLazy(Login, true)
       },
       {
         path: ROUTE.GUEST,
@@ -36,27 +44,15 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTE.REGISTER,
-        element: (
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        )
+        element: wrapWithLazy(Register, true)
       },
       {
         path: ROUTE.FORGOTPASSWORD,
-        element: (
-          <PublicRoute>
-            <ForgotPassword />
-          </PublicRoute>
-        )
+        element: wrapWithLazy(ForgotPassword, true)
       },
       {
         path: ROUTE.RESETPASSWORD,
-        element: (
-          <PublicRoute>
-            <ResetPassword />
-          </PublicRoute>
-        )
+        element: wrapWithLazy(ResetPassword, true)
       },
       {
         path: ROUTE.ROOT,
@@ -68,19 +64,26 @@ export const router = createBrowserRouter([
           },
           {
             path: ROUTE.HOME,
-            element: <Home />
+            element: wrapWithLazy(Home)
           },
           {
             path: ROUTE.TASKS,
-            element: <Tasks />
+            element: wrapWithLazy(Tasks)
           },
           {
             path: ROUTE.PROFILE,
-            element: <Profile />
+            element: wrapWithLazy(Profile)
+          },
+          {
+            path: ROUTE.FOCUS_TIMER,
+            element: wrapWithLazy(FocusTimer)
           }
         ]
       },
-      { path: '*', element: <NotFound /> }
+      {
+        path: '*',
+        element: wrapWithLazy(NotFound)
+      }
     ]
   }
 ])
