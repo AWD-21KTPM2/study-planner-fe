@@ -84,13 +84,13 @@ export const useAuth = (): AuthHookProps => {
   }
 
   const refreshTokenHandler = async (): Promise<void> => {
-    const tokenResponse: JwtRefreshDTO = await refreshTokenApi(authSession, refreshToken)
+    const tokenResponse: JwtRefreshDTO = await refreshTokenApi(refreshToken)
 
     setAuthSession(tokenResponse.accessToken, refreshToken, {
       email: tokenResponse?.email,
       id: tokenResponse?.id
     })
-    // console.log('triggered refresh token')
+    console.log('triggered refresh token')
   }
 
   useEffect(() => {

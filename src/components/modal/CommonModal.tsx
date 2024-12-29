@@ -1,7 +1,9 @@
-import { Button, Modal } from 'antd'
+import { Button, Modal, Typography } from 'antd'
 import { forwardRef, useImperativeHandle, useState } from 'react'
 
 import { IModalMethods } from '@/types/modal.type'
+
+const { Title } = Typography
 
 export interface IModalProps {
   title: string
@@ -41,7 +43,7 @@ const _CommonModal: React.ForwardRefRenderFunction<IModalMethods, IModalProps> =
     <>
       <Modal
         className='view-modal'
-        title={title}
+        title={<Title level={3}>{title}</Title>}
         open={open}
         transitionName='ant-move-up'
         width={width ? width + 'px' : '600px'}
