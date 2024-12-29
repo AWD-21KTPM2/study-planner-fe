@@ -8,34 +8,30 @@ interface TimerControlsProps {
   onReset: () => void
   onSkip: () => void
   enable: boolean
+  loading?: boolean
 }
 
-const TimerControls: React.FC<TimerControlsProps> = ({ isRunning, onStart, onReset, onSkip, enable }) => (
-  <div className='flex items-center gap-6'>
-    <Button
-      icon={<UndoOutlined />}
-      onClick={onReset}
-      size='large'
-      className='hover:!border-emerald-600 focus:!border-emerald-600 active:border-emerald-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg hover:!text-emerald-600 focus:!text-emerald-600 transition-all duration-300 focus:!outline-emerald-600'
-      disabled={!enable}
-    />
-    <Button
-      icon={isRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-      onClick={onStart}
-      size='large'
-      className='hover:!border-emerald-600 bg-emerald-500 focus:!bg-emerald-600 shadow-sm px-8 py-3 rounded-lg font-bold text-lg text-white hover:!text-emerald-600 focus:!text-white transition-all duration-300 hover:scale-105 focus:!outline-emerald-600'
-      disabled={!enable}
-    >
-      {isRunning ? 'PAUSE' : 'START'}
-    </Button>
-    <Button
-      icon={<StepForwardFilled />}
-      onClick={onSkip}
-      size='large'
-      className='hover:!border-emerald-600 focus:!border-emerald-600 active:border-emerald-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg hover:!text-emerald-600 focus:!text-emerald-600 transition-all duration-300 focus:!outline-emerald-600'
-      disabled={!enable}
-    />
-  </div>
-)
+const TimerControls: React.FC<TimerControlsProps> = ({ isRunning, onStart, onReset, onSkip, enable, loading }) => {
+  return (
+    <div className='flex gap-4'>
+      <Button onClick={onReset} disabled={!enable || loading} icon={<UndoOutlined />}>
+        Reset
+      </Button>
+      <Button
+        type='primary'
+        onClick={onStart}
+        disabled={!enable || loading}
+        loading={loading}
+        className='bg-emerald-600 hover:!bg-emerald-700'
+        icon={isRunning ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+      >
+        {isRunning ? 'Pause' : 'Start'}
+      </Button>
+      <Button onClick={onSkip} disabled={!enable || loading} icon={<StepForwardFilled />}>
+        Skip
+      </Button>
+    </div>
+  )
+}
 
 export default TimerControls
