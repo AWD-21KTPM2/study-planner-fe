@@ -1,9 +1,20 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-import { aiSuggestionsImage } from '@/assets/images'
-import { focusTimerImage } from '@/assets/images'
-import { taskManagementImage } from '@/assets/images'
+import {
+  aiSuggestionsImage,
+  analyticsImage,
+  focusTimerImage,
+  personalizedFeedbackImage,
+  seamlessSchedulingImage,
+  step1Image,
+  step2Image,
+  step3Image,
+  taskManagementImage,
+  userTestimonial1Image,
+  userTestimonial2Image,
+  userTestimonial3Image
+} from '@/assets/images'
 
 const LandingPage: React.FC = () => {
   return (
@@ -72,14 +83,14 @@ const LandingPage: React.FC = () => {
             </p>
           </div>
           <div className='p-6 bg-white shadow-md rounded-md'>
-            <img src='/path-to-your-image4.jpg' alt='Analytics' className='w-full h-40 object-cover mb-4 rounded-md' />
+            <img src={analyticsImage} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
             <h3 className='text-2xl font-bold mb-4'>Analytics</h3>
             <p className='text-gray-600'>Visualize your progress and gain insights to improve your learning habits.</p>
           </div>
           <div className='p-6 bg-white shadow-md rounded-md'>
             <img
-              src='/path-to-your-image5.jpg'
-              alt='Personalized Feedback'
+              src={personalizedFeedbackImage}
+              alt='Task Management'
               className='w-full h-40 object-cover mb-4 rounded-md'
             />
             <h3 className='text-2xl font-bold mb-4'>Personalized Feedback</h3>
@@ -89,8 +100,8 @@ const LandingPage: React.FC = () => {
           </div>
           <div className='p-6 bg-white shadow-md rounded-md'>
             <img
-              src='/path-to-your-image6.jpg'
-              alt='Seamless Scheduling'
+              src={seamlessSchedulingImage}
+              alt='Task Management'
               className='w-full h-40 object-cover mb-4 rounded-md'
             />
             <h3 className='text-2xl font-bold mb-4'>Seamless Scheduling</h3>
@@ -108,8 +119,8 @@ const LandingPage: React.FC = () => {
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
             <div className='p-6 bg-gray-100 shadow-md rounded-md'>
               <img
-                src='/path-to-your-image7.jpg'
-                alt='User Testimonial'
+                src={userTestimonial1Image}
+                alt='Task Management'
                 className='w-full h-40 object-cover mb-4 rounded-md'
               />
               <p className='text-gray-600 mb-4'>
@@ -120,8 +131,8 @@ const LandingPage: React.FC = () => {
             </div>
             <div className='p-6 bg-gray-100 shadow-md rounded-md'>
               <img
-                src='/path-to-your-image8.jpg'
-                alt='User Testimonial'
+                src={userTestimonial2Image}
+                alt='Task Management'
                 className='w-full h-40 object-cover mb-4 rounded-md'
               />
               <p className='text-gray-600 mb-4'>
@@ -131,8 +142,8 @@ const LandingPage: React.FC = () => {
             </div>
             <div className='p-6 bg-gray-100 shadow-md rounded-md'>
               <img
-                src='/path-to-your-image9.jpg'
-                alt='User Testimonial'
+                src={userTestimonial3Image}
+                alt='Task Management'
                 className='w-full h-40 object-cover mb-4 rounded-md'
               />
               <p className='text-gray-600 mb-4'>
@@ -150,17 +161,17 @@ const LandingPage: React.FC = () => {
           <h2 className='text-3xl font-bold mb-6'>How It Works</h2>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
             <div className='p-6 bg-white shadow-md rounded-md'>
-              <img src='/path-to-your-image10.jpg' alt='Step 1' className='w-full h-40 object-cover mb-4 rounded-md' />
+              <img src={step1Image} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
               <h3 className='text-2xl font-bold mb-4'>Step 1</h3>
               <p className='text-gray-600'>Sign up and create your profile to get started.</p>
             </div>
             <div className='p-6 bg-white shadow-md rounded-md'>
-              <img src='/path-to-your-image11.jpg' alt='Step 2' className='w-full h-40 object-cover mb-4 rounded-md' />
+              <img src={step2Image} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
               <h3 className='text-2xl font-bold mb-4'>Step 2</h3>
               <p className='text-gray-600'>Add your tasks and organize them on the calendar.</p>
             </div>
             <div className='p-6 bg-white shadow-md rounded-md'>
-              <img src='/path-to-your-image12.jpg' alt='Step 3' className='w-full h-40 object-cover mb-4 rounded-md' />
+              <img src={step3Image} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
               <h3 className='text-2xl font-bold mb-4'>Step 3</h3>
               <p className='text-gray-600'>Use AI feedback and analytics to optimize your learning.</p>
             </div>
