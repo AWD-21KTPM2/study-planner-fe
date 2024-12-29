@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons'
 import { Avatar, Dropdown, Layout, Menu, MenuProps } from 'antd'
 import React from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import { useAuth } from '@/hooks/useAuth'
@@ -60,7 +60,9 @@ const CommonLayout = (): React.ReactNode => {
       <Header className='flex justify-between items-center bg-white px-4 border-b'>
         <div className='flex items-center'>
           <BookOutlined className='text-2xl text-blue-600' />
-          <span className='ml-2 font-semibold text-xl'>Study Planner</span>
+          <Link className='ml-2 font-semibold text-xl' to={ROUTE.ROOT}>
+            Study Planner
+          </Link>
         </div>
         <div className='flex items-center gap-4'>
           <Menu theme='light' mode='horizontal' defaultSelectedKeys={['1']} items={menuItems} />

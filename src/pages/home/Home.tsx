@@ -2,7 +2,7 @@ import '@/pages/home/home.scss'
 
 import { BarChartOutlined, CheckSquareOutlined, RobotOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Collapse, CollapseProps, Empty, Row, Spin, Typography } from 'antd'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import DragAndDropCalendar from '@/components/calendar/DragAndDropCalendar'
 import CommonModal from '@/components/modal/CommonModal'
@@ -11,6 +11,7 @@ import { useTasks } from '@/hooks/useTasks'
 import { AnalyzeTaskDTO } from '@/types/ai-generate.type'
 import { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI } from '@/utils/apis/ai-generate-apis.util'
+import { getTimeProgress, TimerProgressResponse } from '@/utils/apis/insights-apis.util'
 
 import TaskAnalysisTable, { DataProps } from '../ai-generate/TaskAnalysisTable'
 import UserProgress from '../user-progress/UserProgress'
@@ -24,6 +25,7 @@ const Home = (): React.ReactNode => {
   const refAnalyzeModal = useRef<IModalMethods | null>(null)
   const [isLoadingAnalyzes, setIsLoadingAnalyzes] = useState<boolean>(false)
   const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
+  const [userProgressData, setUserProgressData] = useState<TimerProgressResponse>()
 
   const { isLoading, data: tasks, error } = useTasks()
 
@@ -42,11 +44,34 @@ const Home = (): React.ReactNode => {
     setTaskAnalysis([])
   }
 
+  const fetchTimeProgress = async (): Promise<void> => {
+    const response = await getTimeProgress()
+    setUserProgressData(response.data)
+  }
+
+  useEffect(() => {
+    fetchTimeProgress()
+  }, [])
+
   const items: CollapseProps['items'] = [
     {
       key: '1',
-      label: <b>Task Insights</b>,
-      children: <UserProgress />
+      label: (
+        <div className='relative'>
+          <b>Task Insights</b>
+          <Button
+            className='absolute right-0'
+            onClick={(e) => {
+              e.stopPropagation()
+              fetchTimeProgress()
+            }}
+            style={{ top: '-20%' }}
+          >
+            <i className='fa-solid fa-arrows-rotate'></i>
+          </Button>
+        </div>
+      ),
+      children: <UserProgress dataSource={userProgressData} />
     }
   ]
 
