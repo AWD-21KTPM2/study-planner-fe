@@ -61,7 +61,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className='bg-yellow-200 py-12'>
+      <section className='bg-yellow-100 py-12 px-4 md:px-8 lg:px-12'>
         <div className='container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
           <div className='p-6 bg-white shadow-md rounded-md'>
             <img src={taskManagementImage} alt='Task Management' className='w-full h-40 object-cover mb-4 rounded-md' />
@@ -220,7 +220,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className='bg-blue-50 py-12'>
+      <section className='bg-blue-50 py-12 px-4 md:px-8 lg:px-12'>
         <div className='container mx-auto text-center'>
           <h2 className='text-3xl font-bold mb-6'>How It Works</h2>
           <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
