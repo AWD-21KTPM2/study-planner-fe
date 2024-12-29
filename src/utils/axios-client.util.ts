@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { ROUTE } from '@/constants/route.const'
+
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true, // Send cookies when cross-origin requests
@@ -30,7 +32,7 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       localStorage.removeItem('auth-data')
-      window.location.href = '/login'
+      window.location.href = ROUTE.LOGIN
     }
     return Promise.reject(error)
   }

@@ -1,7 +1,8 @@
 import type { ProgressProps } from 'antd'
 import { Flex, Progress, Tag } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
+import { getTimeProgress, TimerProgressResponse } from '@/utils/apis/insights-apis.util'
 import { roundDecimalPercent } from '@/utils/common.util'
 
 const twoColors: ProgressProps['strokeColor'] = {
@@ -9,23 +10,60 @@ const twoColors: ProgressProps['strokeColor'] = {
   '100%': '#87d068'
 }
 
-const UserProgress: React.FC = () => {
-  const [actualTime, _setActualTime] = useState<number>(1)
-  const [estimateTime, _setEstimateTime] = useState<number>(2)
+export interface IUserProgressProps {
+  dataSource: TimerProgressResponse | undefined
+}
 
-  const [totalTasks, _setTotalTasks] = useState<number>(10)
-  const [completedTasks, _setCompletedTasks] = useState<number>(2)
-  const [inProgressTasks, _setInProgressTasks] = useState<number>(3)
-  const [expiredTasks, _setExpiredTasks] = useState<number>(4)
-  const [todoTasks, _setTodoTasks] = useState<number>(6)
+const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource }) => {
+  const [timeRate, setTimeRate] = useState<number>(1) // actual time / estimate time
+
+  const [totalTasks, setTotalTasks] = useState<number>(10)
+  const [completedTasks, setCompletedTasks] = useState<number>(1)
+  const [inProgressTasks, setInProgressTasks] = useState<number>(1)
+  const [expiredTasks, setExpiredTasks] = useState<number>(1)
+  const [todoTasks, setTodoTasks] = useState<number>(1)
+  const [userProgressData, setUserProgressData] = useState<TimerProgressResponse>()
+
+  // useEffect(() => {
+  //   const timeoutTimer = setInterval(async () => {
+  //     const response = await getTimeProgress()
+  //     setUserProgressData(response.data)
+  //   }, 100)
+
+  //   return (): void => {
+  //     clearInterval(timeoutTimer)
+  //   }
+  // }, [])
+
+  // useEffect(() => {
+  //   if (userProgressData) {
+  //     setTimeRate(parseFloat(userProgressData.totalProductivity))
+  //     setTotalTasks(userProgressData.totalTasks)
+  //     setCompletedTasks(userProgressData.countCompletedTasks)
+  //     setInProgressTasks(userProgressData.countInProgressTasks)
+  //     setExpiredTasks(userProgressData.countExpiredTasks)
+  //     setTodoTasks(userProgressData.countTodoTasks)
+  //   }
+  // }, [userProgressData])
+
+  useEffect(() => {
+    if (_dataSource) {
+      setTimeRate(parseFloat(_dataSource.totalProductivity))
+      setTotalTasks(_dataSource.totalTasks)
+      setCompletedTasks(_dataSource.countCompletedTasks)
+      setInProgressTasks(_dataSource.countInProgressTasks)
+      setExpiredTasks(_dataSource.countExpiredTasks)
+      setTodoTasks(_dataSource.countTodoTasks)
+    }
+  }, [_dataSource])
 
   return (
     <Flex vertical gap='middle'>
       <Progress
-        percent={roundDecimalPercent(actualTime, estimateTime)}
+        percent={timeRate}
         format={(percent) => `${percent}% (Actual time/ Estimate time)`}
         strokeColor={twoColors}
-        status={roundDecimalPercent(actualTime, estimateTime) === 100 ? 'success' : 'active'}
+        status={timeRate === 100 ? 'success' : 'active'}
       />
 
       <Flex gap='middle' justify='center'>
