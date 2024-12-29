@@ -35,6 +35,14 @@ export const router = createBrowserRouter([
         element: wrapWithLazy(Login, true)
       },
       {
+        path: ROUTE.GUEST,
+        element: (
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        )
+      },
+      {
         path: ROUTE.REGISTER,
         element: wrapWithLazy(Register, true)
       },
