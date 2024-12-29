@@ -1,11 +1,12 @@
 import '@/pages/home/home.scss'
 
-import { BarChartOutlined, CheckSquareOutlined, RobotOutlined } from '@ant-design/icons'
+import { BarChartOutlined, CheckSquareOutlined, LoadingOutlined, RobotOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Collapse, CollapseProps, Empty, Row, Spin, Typography } from 'antd'
 import React, { useEffect, useRef, useState } from 'react'
 
 import DragAndDropCalendar from '@/components/calendar/DragAndDropCalendar'
-import CommonModal from '@/components/modal/CommonModal'
+import AiAnalyzeModal from '@/components/modal/CommonModal'
+import GenerateFeedbackModal from '@/components/modal/CommonModal'
 import { useAuth } from '@/hooks/useAuth'
 import { useTasks } from '@/hooks/useTasks'
 import { AnalyzeTaskDTO } from '@/types/ai-generate.type'
@@ -23,9 +24,12 @@ const Home = (): React.ReactNode => {
   const { authSession } = useAuth()
   const [taskAnalysis, setTaskAnalysis] = useState<DataProps[]>()
   const refAnalyzeModal = useRef<IModalMethods | null>(null)
+  const refFeedbackModal = useRef<IModalMethods | null>(null)
   const [isLoadingAnalyzes, setIsLoadingAnalyzes] = useState<boolean>(false)
+  const [isLoadingFeedback, setIsLoadingFeedback] = useState<boolean>(false)
   const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
   const [userProgressData, setUserProgressData] = useState<TimerProgressResponse>()
+  const [userProgressLoading, setUserProgressLoading] = useState<boolean>(false)
 
   const { isLoading, data: tasks, error } = useTasks()
 
@@ -40,13 +44,21 @@ const Home = (): React.ReactNode => {
     setIsLoadingAnalyzes(false)
   }
 
+  const generateFeedbackHandler = (): void => {
+    setIsLoadingFeedback(true)
+    refFeedbackModal?.current?.showModal()
+    setIsLoadingFeedback(false)
+  }
+
   const analyzeTaskCancel = (): void => {
     setTaskAnalysis([])
   }
 
   const fetchTimeProgress = async (): Promise<void> => {
+    setUserProgressLoading(true)
     const response = await getTimeProgress()
     setUserProgressData(response.data)
+    setUserProgressLoading(false)
   }
 
   useEffect(() => {
@@ -58,7 +70,7 @@ const Home = (): React.ReactNode => {
       key: '1',
       label: (
         <div className='relative'>
-          <b>Task Insights</b>
+          <b className='text-base'>Task Insights</b>
           <Button
             className='absolute right-0'
             onClick={(e) => {
@@ -71,7 +83,11 @@ const Home = (): React.ReactNode => {
           </Button>
         </div>
       ),
-      children: <UserProgress dataSource={userProgressData} />
+      children: userProgressLoading ? (
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 40 }} spin />} />
+      ) : (
+        <UserProgress dataSource={userProgressData} />
+      )
     }
   ]
 
@@ -115,7 +131,7 @@ const Home = (): React.ReactNode => {
             description='Give feedback about my tasks'
             className='bg-blue-50 hover:bg-blue-200 shadow-md'
             icon={<RobotOutlined className='text-2xl text-blue-600' />}
-            action={analyzeTaskHandler}
+            action={generateFeedbackHandler}
           />
         </Col>
       </Row>
@@ -155,7 +171,9 @@ const Home = (): React.ReactNode => {
           </Card>
         </Col>
       </Row>
-      <CommonModal title='AI Analysis' width={1000} ref={refAnalyzeModal} handleCancel={analyzeTaskCancel}>
+
+      {/* AI Analyze Modal */}
+      <AiAnalyzeModal title='AI Analysis' width={1000} ref={refAnalyzeModal} handleCancel={analyzeTaskCancel}>
         {isLoadingAnalyzes ? (
           <div className='flex justify-center w-full'>
             <Spin tip='Loading' size='large' />
@@ -163,7 +181,30 @@ const Home = (): React.ReactNode => {
         ) : (
           <TaskAnalysisTable dataSource={taskAnalysis} />
         )}
-      </CommonModal>
+      </AiAnalyzeModal>
+
+      {/* AI Feedback Modal */}
+      <GenerateFeedbackModal title='AI Feedback' width={1000} ref={refFeedbackModal}>
+        <div className='flex justify-center w-full'>
+          {/* <Spin tip='Loading' size='large' /> */}
+          **Critical Feedback:** * **Task 5 (High Priority):** Expired and incomplete. Prioritize high-priority tasks
+          immediately. * **Many Expired Tasks:** Numerous tasks (tasks 2, 4, 14, 15, etc.) show poor time management.
+          Review scheduling and prioritization strategies. * **Task 27:** Significant time overage (8.08 vs 10
+          estimated). Improve time estimation accuracy. * **Task 29:** In progress for an extended period (over 2 days).
+          Break down large tasks into smaller, manageable units. * **Multiple Overlapping Tasks:** Schedule shows
+          numerous conflicts. Use a calendar to visualize and avoid overlaps. * **Inconsistent Time Tracking:** Actual
+          time is often zero, even for completed tasks. Ensure accurate time logging for effective analysis. * **Task
+          13:** Successfully completed and significantly under the estimated time. Maintain this efficiency on other
+          tasks. * **Overall:** Many low priority tasks are overdue. Focus on completing high priority tasks first and
+          schedule better. **Areas for Improvement:** * **Prioritization:** Focus on high-priority tasks before
+          low-priority ones. * **Time Estimation:** Refine your ability to estimate task completion times. * **Task
+          Breakdown:** Divide large tasks into smaller, more manageable chunks. * **Scheduling:** Use a calendar or
+          planner to schedule tasks and avoid conflicts. * **Time Tracking:** Consistently track time spent on tasks for
+          better analysis. **Motivational Note:** You` ve shown efficiency on some tasks. With improved planning and time
+          management, you can achieve even greater success!
+        </div>
+      </GenerateFeedbackModal>
+
       <NewTaskModal isOpen={isNewTaskOpen} onClose={() => setIsNewTaskOpen(false)} />
     </div>
   )
