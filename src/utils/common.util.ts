@@ -1,8 +1,8 @@
-export function roundDecimalPercent(a: number, b: number): number {
-  if (b === 0) {
-    throw new Error('Division by zero is not allowed.')
+export function roundPercentForUserProgress(specificTask: number, totalTask: number): number {
+  if (totalTask === 0) {
+    return 0
   }
-  return Math.round((a / b) * 100)
+  return Math.round((specificTask / totalTask) * 100)
 }
 
 export function formatAIGenerateFeedback(feedback: string): string {
