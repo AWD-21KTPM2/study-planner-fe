@@ -34,6 +34,20 @@ const FocusTimer: React.FC = () => {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1)
       }, 1000)
+    } else if (isRunning && timeLeft === 0) {
+      // When timer completes, switch to the next mode
+      const nextMode = selectedMode.toLowerCase() === DEFAULT_MODES[0].id ? DEFAULT_MODES[1].id : DEFAULT_MODES[0].id
+      handleModeSelect(modes.find((mode) => mode.id === nextMode)?.id as string)
+
+      // Stop the current timer
+      stopTimer(
+        { taskId: selectedTaskId as string, flag: getFlag() },
+        {
+          onSuccess: () => {
+            setIsRunning(false)
+          }
+        }
+      )
     }
 
     return (): void => {
@@ -41,7 +55,7 @@ const FocusTimer: React.FC = () => {
         clearInterval(interval)
       }
     }
-  }, [isRunning, timeLeft])
+  }, [isRunning, timeLeft, modes, selectedMode, selectedTaskId, stopTimer])
 
   const getFlag = (): boolean => modes.find((mode) => mode.id === selectedMode)?.id === 'study'
 
@@ -101,6 +115,13 @@ const FocusTimer: React.FC = () => {
     const selectedModeData = modes.find((mode) => mode.id === modeId)
     setIsRunning(false)
     setTimeLeft(selectedModeData ? selectedModeData.duration * 60 : 0)
+    // Optional: Play a sound or show notification when mode changes
+    if (timeLeft === 0) {
+      new Audio('/notification-sound.wav').play().catch(() => {
+        // Handle audio play error silently
+        console.error('Failed to play audio')
+      })
+    }
   }
 
   const handleModesChange = (newModes: TimerMode[]): void => {
