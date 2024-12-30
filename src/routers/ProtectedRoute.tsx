@@ -8,7 +8,7 @@ type RouteProps = {
   redirectTo?: string
   children?: React.ReactNode
 }
-export default function ProtectedRoute({ isAllowed, redirectTo = ROUTE.LOGIN, children }: RouteProps): React.ReactNode {
+export default function ProtectedRoute({ isAllowed, redirectTo = ROUTE.GUEST, children }: RouteProps): React.ReactNode {
   if (!isAllowed) {
     return <Navigate to={redirectTo} />
   }
