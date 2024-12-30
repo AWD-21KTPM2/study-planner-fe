@@ -31,6 +31,7 @@ export const useCreateTask = (): UseMutationResult<Task | undefined, Error, Task
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (task: Task) => {
+      task.endDate = dayjs(task.startDate).add(task.estimatedTime, 'minute').toDate()
       const response = await createTask(task)
       return response.data
     },
@@ -63,16 +64,11 @@ export const useUpdateTask = (): UseMutationResult<Task | undefined, Error, { id
   return useMutation({
     mutationFn: async ({ id, task }) => {
       if (task.startDate && task.endDate) {
-        // check if estimated time is not match with start and end date
-        if (task.estimatedTime !== dayjs(task.endDate).diff(dayjs(task.startDate), 'minute')) {
-          message.warning({
-            content:
-              'Estimated time does not match with start and end date, we will update the estimated time to match with start and end date',
-            key: 'estimated-time-mismatch',
-            duration: 2
-          })
-          task.estimatedTime = dayjs(task.endDate).diff(dayjs(task.startDate), 'minute')
-        }
+        task.estimatedTime = dayjs(task.endDate).diff(dayjs(task.startDate), 'minute')
+      }
+
+      if (task.estimatedTime) {
+        task.endDate = dayjs(task.startDate).add(task.estimatedTime, 'minute').toDate()
       }
 
       const response = await updateTask(id, task)

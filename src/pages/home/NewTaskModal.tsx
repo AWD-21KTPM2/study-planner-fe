@@ -49,27 +49,17 @@ const newTaskSchema = zod.object({
     .min(1, 'Estimated time must be at least 1 minute')
     .max(480, 'Estimated time cannot exceed 8 hours'),
   startDate: zod.date().optional(),
-  endDate: zod
-    .date()
-    .optional()
-    .refine((data) => dayjs(data).isAfter(dayjs()), {
-      message: 'End date must be after start date'
-    }),
   status: zod.nativeEnum(TaskStatus, { required_error: 'Status is required' })
 })
 
 const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
   const { mutate: createTask, isPending, reset: resetCreateTask, isSuccess } = useCreateTask()
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false)
-
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors },
-    getValues,
-    setValue
+    formState: { errors }
   } = useForm<NewTaskFormData>({
     resolver: zodResolver(newTaskSchema),
     defaultValues: {
@@ -78,27 +68,12 @@ const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
       priority: TaskPriority.LOW,
       estimatedTime: 10,
       status: TaskStatus.TODO,
-      startDate: dayjs().toDate(),
-      endDate: dayjs().add(1, 'hour').toDate()
+      startDate: dayjs().toDate()
     }
   })
 
   const onSubmit: SubmitHandler<NewTaskFormData> = async (data) => {
-    // confirm estimated time if it doesn't match with start and end date
-    if (data.estimatedTime !== dayjs(data.endDate).diff(dayjs(data.startDate), 'minute')) {
-      setIsConfirmOpen(true)
-      return
-    }
-
     createTask(data)
-  }
-
-  const handleConfirmEstimatedTime = async (): Promise<void> => {
-    // update estimated time
-    const data = getValues()
-    data.estimatedTime = dayjs(data.endDate).diff(dayjs(data.startDate), 'minute')
-    setValue('estimatedTime', data.estimatedTime)
-    setIsConfirmOpen(false)
   }
 
   const handleCancel = (): void => {
@@ -116,140 +91,98 @@ const NewTaskModal = ({ isOpen, onClose }: NewTaskModalProps): JSX.Element => {
   }, [isSuccess])
 
   return (
-    <>
-      <Modal
-        open={isOpen}
-        onCancel={handleCancel}
-        title='New Task'
-        onOk={handleSubmit(onSubmit)}
-        confirmLoading={isPending}
-        destroyOnClose
-      >
-        <Form layout='vertical' className='space-y-4'>
-          <Controller
-            name='name'
-            control={control}
-            render={({ field }) => (
-              <Form.Item label='Title' validateStatus={errors.name ? 'error' : ''} help={errors.name?.message}>
-                <Input {...field} placeholder='eg. Laundry' />
-              </Form.Item>
-            )}
-          />
+    <Modal
+      open={isOpen}
+      onCancel={handleCancel}
+      title='New Task'
+      onOk={handleSubmit(onSubmit)}
+      confirmLoading={isPending}
+      destroyOnClose
+    >
+      <Form layout='vertical' className='space-y-4'>
+        <Controller
+          name='name'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Title' validateStatus={errors.name ? 'error' : ''} help={errors.name?.message}>
+              <Input {...field} placeholder='eg. Laundry' />
+            </Form.Item>
+          )}
+        />
 
-          <Controller
-            name='description'
-            control={control}
-            render={({ field }) => (
-              <Form.Item
-                label='Description'
-                validateStatus={errors.description ? 'error' : ''}
-                help={errors.description?.message}
-              >
-                <Input.TextArea {...field} rows={4} placeholder='eg. Do the laundry' />
-              </Form.Item>
-            )}
-          />
+        <Controller
+          name='description'
+          control={control}
+          render={({ field }) => (
+            <Form.Item
+              label='Description'
+              validateStatus={errors.description ? 'error' : ''}
+              help={errors.description?.message}
+            >
+              <Input.TextArea {...field} rows={4} placeholder='eg. Do the laundry' />
+            </Form.Item>
+          )}
+        />
 
-          <Controller
-            name='priority'
-            control={control}
-            render={({ field }) => (
-              <Form.Item
-                label='Priority'
-                validateStatus={errors.priority ? 'error' : ''}
-                help={errors.priority?.message}
-              >
-                <Select {...field} options={TaskPriorityOptions} labelRender={taskPriorityLabelRender} />
-              </Form.Item>
-            )}
-          />
+        <Controller
+          name='priority'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Priority' validateStatus={errors.priority ? 'error' : ''} help={errors.priority?.message}>
+              <Select {...field} options={TaskPriorityOptions} labelRender={taskPriorityLabelRender} />
+            </Form.Item>
+          )}
+        />
 
-          <div className='flex justify-between gap-4'>
-            <Controller
-              name='startDate'
-              control={control}
-              render={({ field }) => (
-                <Form.Item
-                  label='Start Date'
-                  validateStatus={errors.startDate ? 'error' : ''}
-                  help={errors.startDate?.message}
-                  className='flex-1'
-                >
-                  <DatePicker
-                    format='DD/MM/YYYY HH:mm'
-                    {...field}
-                    value={field.value ? dayjs(field.value) : undefined}
-                    onChange={(value) => {
-                      field.onChange(value?.toDate())
-                    }}
-                    showTime={{ format: 'HH:mm' }}
-                    className='w-full'
-                  />
-                </Form.Item>
-              )}
-            />
+        <Controller
+          name='startDate'
+          control={control}
+          render={({ field }) => (
+            <Form.Item
+              label='Start Date'
+              validateStatus={errors.startDate ? 'error' : ''}
+              help={errors.startDate?.message}
+              className='flex-1'
+            >
+              <DatePicker
+                format='DD/MM/YYYY HH:mm'
+                {...field}
+                value={field.value ? dayjs(field.value) : undefined}
+                onChange={(value) => {
+                  field.onChange(value?.toDate())
+                }}
+                showTime={{ format: 'HH:mm' }}
+                className='w-full'
+              />
+            </Form.Item>
+          )}
+        />
 
-            <Controller
-              name='endDate'
-              control={control}
-              render={({ field }) => (
-                <Form.Item
-                  label='End Date'
-                  validateStatus={errors.endDate ? 'error' : ''}
-                  help={errors.endDate?.message}
-                  className='flex-1'
-                >
-                  <DatePicker
-                    format='DD/MM/YYYY HH:mm'
-                    {...field}
-                    value={field.value ? dayjs(field.value) : undefined}
-                    onChange={(value) => {
-                      field.onChange(value?.toDate())
-                    }}
-                    showTime={{ format: 'HH:mm' }}
-                    className='w-full'
-                  />
-                </Form.Item>
-              )}
-            />
-          </div>
+        <Controller
+          name='estimatedTime'
+          control={control}
+          render={({ field }) => (
+            <Form.Item
+              label='Estimated Time'
+              validateStatus={errors.estimatedTime ? 'error' : ''}
+              help={errors.estimatedTime?.message}
+            >
+              <InputNumber {...field} addonAfter='minutes' min={1} max={480} />
+            </Form.Item>
+          )}
+        />
 
-          <Controller
-            name='estimatedTime'
-            control={control}
-            render={({ field }) => (
-              <Form.Item
-                label='Estimated Time'
-                validateStatus={errors.estimatedTime ? 'error' : ''}
-                help={errors.estimatedTime?.message}
-              >
-                <InputNumber {...field} addonAfter='minutes' min={1} max={480} />
-              </Form.Item>
-            )}
-          />
-
-          <Controller
-            name='status'
-            control={control}
-            render={({ field }) => (
-              <Form.Item label='Status' validateStatus={errors.status ? 'error' : ''} help={errors.status?.message}>
-                <Select {...field} options={TaskStatusOptions} labelRender={taskStatusLabelRender} />
-              </Form.Item>
-            )}
-          />
-        </Form>
-      </Modal>
-      {/* Confirm estimated time */}
-      <Modal
-        open={isConfirmOpen}
-        onCancel={() => setIsConfirmOpen(false)}
-        title='Confirm Estimated Time'
-        onOk={handleConfirmEstimatedTime}
-      >
-        <p>Estimated time does not match with start and end date</p>
-        <p>We will update the estimated time to match with start and end date</p>
-      </Modal>
-    </>
+        <Controller
+          name='status'
+          control={control}
+          render={({ field }) => (
+            <Form.Item label='Status' validateStatus={errors.status ? 'error' : ''} help={errors.status?.message}>
+              <Select {...field} options={TaskStatusOptions} labelRender={taskStatusLabelRender} />
+            </Form.Item>
+          )}
+        />
+      </Form>
+    </Modal>
   )
 }
 

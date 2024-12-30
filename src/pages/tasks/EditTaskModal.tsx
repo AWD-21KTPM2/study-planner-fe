@@ -4,7 +4,7 @@ import type { SelectProps } from 'antd'
 import { Button, DatePicker, Form, Input, InputNumber, message, Modal, Select, Tag, Tooltip } from 'antd'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import { useNavigate } from 'react-router-dom'
@@ -37,36 +37,25 @@ export type EditTaskFormData = {
   priority: TaskPriority
   estimatedTime: number
   status: TaskStatus
-  startDate: Date | null
-  endDate: Date | null
+  startDate: dayjs.Dayjs | null
 }
 
 // Moved schema outside component to prevent recreation
-const newTaskSchema = zod
-  .object({
-    name: zod.string().min(1, 'Title is required').max(100, 'Title is too long'),
-    description: zod.string().max(500, 'Description is too long').optional(),
-    priority: zod.nativeEnum(TaskPriority, { required_error: 'Priority is required' }),
-    estimatedTime: zod
-      .number()
-      .min(1, 'Estimated time must be at least 1 minute')
-      .max(480, 'Estimated time cannot exceed 8 hours'),
-    startDate: zod.date().nullable(),
-    endDate: zod.date().nullable(),
-    status: zod.nativeEnum(TaskStatus, { required_error: 'Status is required' })
-  })
-  .refine(
-    (data) => {
-      if (data.startDate && data.endDate) {
-        return data.endDate > data.startDate
-      }
-      return true
-    },
-    {
-      message: 'End date must be after start date',
-      path: ['endDate']
-    }
-  )
+const newTaskSchema = zod.object({
+  name: zod.string().min(1, 'Title is required').max(100, 'Title is too long'),
+  description: zod.string().max(500, 'Description is too long').optional(),
+  priority: zod.nativeEnum(TaskPriority, { required_error: 'Priority is required' }),
+  estimatedTime: zod
+    .number()
+    .min(1, 'Estimated time must be at least 1 minute')
+    .max(480, 'Estimated time cannot exceed 8 hours'),
+  startDate: zod
+    .custom<dayjs.Dayjs | null>((val) => val === null || dayjs.isDayjs(val), {
+      message: 'Invalid date format'
+    })
+    .nullable(),
+  status: zod.nativeEnum(TaskStatus, { required_error: 'Status is required' })
+})
 
 const priorityTooltips = {
   [TaskPriority.CRITICAL]: 'Urgent tasks that need immediate attention',
@@ -106,23 +95,16 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
     []
   )
 
-  // Memoized default values
-  const defaultValues = useMemo<EditTaskFormData>(
-    () => ({
-      name: task?.name ?? '',
-      description: task?.description ?? '',
-      priority: (task?.priority as TaskPriority) ?? TaskPriority.MEDIUM,
-      estimatedTime: task?.estimatedTime ?? 30,
-      status: (task?.status as TaskStatus) ?? TaskStatus.TODO,
-      startDate: task?.startDate ? new Date(task.startDate) : null,
-      endDate: task?.endDate ? new Date(task.endDate) : null
-    }),
-    [task]
-  )
-
   const { control, handleSubmit, reset } = useForm<EditTaskFormData>({
     resolver: zodResolver(newTaskSchema),
-    defaultValues
+    defaultValues: {
+      name: '',
+      description: '',
+      priority: TaskPriority.LOW,
+      estimatedTime: 10,
+      status: TaskStatus.TODO,
+      startDate: dayjs()
+    }
   })
 
   useEffect(() => {
@@ -133,8 +115,7 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
         priority: task.priority as TaskPriority,
         estimatedTime: task.estimatedTime,
         status: task.status as TaskStatus,
-        startDate: task.startDate ? new Date(task.startDate) : null,
-        endDate: task.endDate ? new Date(task.endDate) : null
+        startDate: task.startDate ? dayjs(task.startDate) : dayjs()
       })
     }
   }, [task])
@@ -144,15 +125,14 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
       message.error('Task ID is required')
       return
     }
-    // Convert null dates to undefined for the API
+
     const formattedData = {
       name: data.name,
       description: data.description,
       priority: data.priority,
       estimatedTime: data.estimatedTime,
       status: data.status,
-      startDate: data.startDate || undefined,
-      endDate: data.endDate || undefined
+      startDate: data.startDate ? data.startDate.toDate() : undefined
     }
     updateTask({ id: taskId, task: formattedData })
   }
@@ -219,43 +199,14 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
             />
           </FormItem>
 
-          <div className='flex justify-between gap-4'>
-            <FormItem
-              control={control}
-              name='startDate'
-              label='Start Date'
-              className='flex-1'
-              getValueProps={(value) => ({
-                value: value ? dayjs(value) : undefined
-              })}
-              normalize={(value) => value?.toDate()}
-            >
-              <DatePicker
-                format='DD/MM/YYYY HH:mm'
-                showTime={{ format: 'HH:mm' }}
-                className='w-full'
-                placeholder='Select start date'
-              />
-            </FormItem>
-
-            <FormItem
-              control={control}
-              name='endDate'
-              label='End Date'
-              className='flex-1'
-              getValueProps={(value) => ({
-                value: value ? dayjs(value) : undefined
-              })}
-              normalize={(value) => value?.toDate()}
-            >
-              <DatePicker
-                format='DD/MM/YYYY HH:mm'
-                showTime={{ format: 'HH:mm' }}
-                className='w-full'
-                placeholder='Select end date'
-              />
-            </FormItem>
-          </div>
+          <FormItem control={control} name='startDate' label='Start Date' className='flex-1'>
+            <DatePicker
+              format='DD/MM/YYYY HH:mm'
+              showTime={{ format: 'HH:mm' }}
+              className='w-full'
+              placeholder='Select start date'
+            />
+          </FormItem>
         </div>
 
         <div className='space-y-4'>
