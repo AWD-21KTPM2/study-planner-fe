@@ -3,7 +3,7 @@ import { Flex, Progress, Tag } from 'antd'
 import React, { useEffect, useState } from 'react'
 
 import { TimerProgressResponse } from '@/utils/apis/insights-apis.util'
-import { roundDecimalPercent } from '@/utils/common.util'
+import { roundPercentForUserProgress } from '@/utils/common.util'
 
 const twoColors: ProgressProps['strokeColor'] = {
   '0%': '#108ee9',
@@ -47,7 +47,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
         <Flex gap='small' vertical>
           <Progress
             type='circle'
-            percent={roundDecimalPercent(todoTasks, totalTasks)}
+            percent={roundPercentForUserProgress(todoTasks, totalTasks)}
             format={() => `${todoTasks}/${totalTasks}`}
           />
           <Tag color='default' className='text-base me-0 text-center'>
@@ -58,7 +58,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
         <Flex gap='small' vertical>
           <Progress
             type='circle'
-            percent={roundDecimalPercent(inProgressTasks, totalTasks)}
+            percent={roundPercentForUserProgress(inProgressTasks, totalTasks)}
             format={() => `${inProgressTasks}/${totalTasks}`}
           />
           <Tag color='processing' className='text-base me-0 text-center'>
@@ -69,7 +69,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
         <Flex gap='small' vertical>
           <Progress
             type='circle'
-            percent={roundDecimalPercent(completedTasks, totalTasks)}
+            percent={roundPercentForUserProgress(completedTasks, totalTasks)}
             format={() => `${completedTasks}/${totalTasks}`}
           />
           <Tag color='success' className='text-base me-0 text-center'>
@@ -80,7 +80,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
         <Flex gap='small' vertical>
           <Progress
             type='circle'
-            percent={roundDecimalPercent(expiredTasks, totalTasks)}
+            percent={roundPercentForUserProgress(expiredTasks, totalTasks)}
             format={() => `${expiredTasks}/${totalTasks}`}
           />
           <Tag color='error' className='text-base me-0 text-center'>
