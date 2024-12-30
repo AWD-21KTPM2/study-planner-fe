@@ -42,7 +42,7 @@ axiosClient.interceptors.response.use(
       if (retryFlag) {
         // If already retried, reject the promise
         localStorage.removeItem('auth-data')
-        window.location.href = ROUTE.LOGIN
+        window.location.href = ROUTE.GUEST
         retryFlag = false
         return Promise.reject(error)
       }
@@ -57,7 +57,7 @@ axiosClient.interceptors.response.use(
         const authData = localStorage.getItem('auth-data')
         if (!authData) {
           // No refresh token, redirect to login
-          window.location.href = ROUTE.LOGIN
+          window.location.href = ROUTE.GUEST
           retryFlag = false
           return Promise.reject(error)
         }
@@ -89,7 +89,7 @@ axiosClient.interceptors.response.use(
       } catch (refreshError) {
         // Refresh token failed, clear auth data and redirect to login
         localStorage.removeItem('auth-data')
-        window.location.href = ROUTE.LOGIN
+        window.location.href = ROUTE.GUEST
         return Promise.reject(refreshError)
       }
     }
