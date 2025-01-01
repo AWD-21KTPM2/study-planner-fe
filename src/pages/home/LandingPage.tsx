@@ -1,4 +1,7 @@
+import 'react-responsive-carousel/lib/styles/carousel.min.css'
+
 import React from 'react'
+import { Carousel } from 'react-responsive-carousel'
 import { Link } from 'react-router-dom'
 
 import {
@@ -116,106 +119,55 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonial Section */}
-      {/* <section className='bg-white py-12'>
+      <section className='bg-white py-12'>
         <div className='container mx-auto text-center'>
           <h2 className='text-3xl font-bold mb-6'>What Our Users Say</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+
+          <Carousel
+            showArrows={true}
+            infiniteLoop={true}
+            showThumbs={false}
+            showStatus={false}
+            autoPlay={true}
+            interval={5000}
+          >
+            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
               <img
                 src={userTestimonial1Image}
-                alt='Task Management'
-                className='w-full h-40 object-cover mb-4 rounded-md'
+                alt='User Testimonial'
+                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
               />
-              <p className='text-gray-600 mb-4'>
+              <p className='text-gray-600 mb-2'>
                 &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
                 on!&quot;
               </p>
               <h4 className='font-bold text-lg'>- Alex M.</h4>
             </div>
-            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+
+            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
               <img
                 src={userTestimonial2Image}
-                alt='Task Management'
-                className='w-full h-40 object-cover mb-4 rounded-md'
+                alt='User Testimonial'
+                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
               />
-              <p className='text-gray-600 mb-4'>
+              <p className='text-gray-600 mb-2'>
                 &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
               </p>
               <h4 className='font-bold text-lg'>- Sarah L.</h4>
             </div>
-            <div className='p-6 bg-gray-100 shadow-md rounded-md'>
+
+            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
               <img
                 src={userTestimonial3Image}
-                alt='Task Management'
-                className='w-full h-40 object-cover mb-4 rounded-md'
+                alt='User Testimonial'
+                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
               />
-              <p className='text-gray-600 mb-4'>
+              <p className='text-gray-600 mb-2'>
                 &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
               </p>
               <h4 className='font-bold text-lg'>- Michael T.</h4>
             </div>
-          </div>
-        </div>
-      </section> */}
-      <section className='bg-white py-12'>
-        <div className='container mx-auto text-center'>
-          {/* Section Heading */}
-          <h2 className='text-3xl font-bold mb-6'>What Our Users Say</h2>
-
-          {/* Testimonials Grid */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {/* Testimonial 1 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
-              <img
-                src={userTestimonial1Image}
-                alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mr-4'
-              />
-              {/* Quote and Name */}
-              <div className='text-left'>
-                <p className='text-gray-600 mb-2'>
-                  &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
-                  on!&quot;
-                </p>
-                <h4 className='font-bold text-lg'>- Alex M.</h4>
-              </div>
-            </div>
-
-            {/* Testimonial 2 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
-              <img
-                src={userTestimonial2Image}
-                alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mr-4'
-              />
-              {/* Quote and Name */}
-              <div className='text-left'>
-                <p className='text-gray-600 mb-2'>
-                  &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
-                </p>
-                <h4 className='font-bold text-lg'>- Sarah L.</h4>
-              </div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
-              <img
-                src={userTestimonial3Image}
-                alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mr-4'
-              />
-              {/* Quote and Name */}
-              <div className='text-left'>
-                <p className='text-gray-600 mb-2'>
-                  &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
-                </p>
-                <h4 className='font-bold text-lg'>- Michael T.</h4>
-              </div>
-            </div>
-          </div>
+          </Carousel>
         </div>
       </section>
 
