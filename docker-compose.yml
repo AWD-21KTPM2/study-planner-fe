@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  study-planner-fe:
+    image: ngductuan/study-planner-fe:latest
+    container_name: study-planner-fe
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
