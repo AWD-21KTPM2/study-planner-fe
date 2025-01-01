@@ -1,22 +1,22 @@
 ### BUILD STAGE
-FROM node:18.18-alpine AS build
+FROM node:18-alpine as build
 
-WORKDIR /app
+WORKDIR /app/
 
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock /app/
 
-RUN yarn install --frozen-lockfile
+RUN yarn
 
-COPY . .
+COPY . /app/
 
 RUN yarn build
 
-### RUN STAGE
+# ### RUN STAGE
 FROM nginx:alpine
 
-COPY --from=build /app/build/ /usr/share/nginx/html/
+COPY --from=build /app/dist/ /usr/share/nginx/html/
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/nginx.conf  /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
