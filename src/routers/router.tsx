@@ -13,6 +13,7 @@ const LandingPage = lazy(() => import('@/pages/home/LandingPage'))
 const RenderMain = lazy(() => import('@/pages/main/RenderMain'))
 const NotFound = lazy(() => import('@/pages/not-found/NotFound'))
 const Profile = lazy(() => import('@/pages/profile/Profile'))
+const ActivationPage = lazy(() => import('@/pages/sign-up/ActivationForm'))
 const Register = lazy(() => import('@/pages/sign-up/Register'))
 const Tasks = lazy(() => import('@/pages/tasks'))
 const ForgotPassword = lazy(() => import('@/pages/forgot-password/ForgotPassword'))
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTE.REGISTER,
         element: wrapWithLazy(Register, true)
+      },
+      {
+        path: ROUTE.ACTIVATE,
+        element: wrapWithLazy(ActivationPage, true)
       },
       {
         path: ROUTE.FORGOTPASSWORD,
