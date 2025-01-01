@@ -138,7 +138,6 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonial Section */}
       {/* Testimonials Section */}
       <section className='bg-white py-12'>
         <div className='container mx-auto text-center'>
