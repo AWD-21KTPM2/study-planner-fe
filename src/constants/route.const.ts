@@ -2,6 +2,7 @@ export const ROUTE = {
   ROOT: '/',
   HOME: '/home',
   GUEST: '/guest',
+  ACTIVATE: '/activate',
   LOGIN: '/login',
   REGISTER: '/register',
   PROFILE: '/profile',
