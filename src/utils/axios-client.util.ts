@@ -38,6 +38,12 @@ axiosClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Check if this is the retry attempt
       const originalRequest = error.config
+      const authData = localStorage.getItem('auth-data')
+
+      if (!authData) {
+        // window.location.href = ROUTE.LOGIN
+        return Promise.reject(error)
+      }
 
       if (retryFlag) {
         // If already retried, reject the promise
@@ -53,8 +59,7 @@ axiosClient.interceptors.response.use(
       console.log('originalRequest._retry', originalRequest._retry)
 
       try {
-        // Fetch refresh token
-        const authData = localStorage.getItem('auth-data')
+        // Fetch refresh token from local storage
         if (!authData) {
           // No refresh token, redirect to login
           window.location.href = ROUTE.GUEST

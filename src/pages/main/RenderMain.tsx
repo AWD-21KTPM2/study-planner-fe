@@ -9,7 +9,7 @@ import CommonLayout from './Layout'
 const RenderMain: React.FC = () => {
   const { authSession } = useAuth()
   return (
-    <ProtectedRoute isAllowed={!!authSession} redirectTo={ROUTE.GUEST}>
+    <ProtectedRoute isAllowed={!!authSession} redirectTo={ROUTE.HOME}>
       <CommonLayout />
     </ProtectedRoute>
   )

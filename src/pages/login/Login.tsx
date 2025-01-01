@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
 import { Alert, Button, Checkbox, Form, Input, message, Spin } from 'antd'
 import Link from 'antd/es/typography/Link'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import React, { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
@@ -88,10 +88,13 @@ const Login: React.FC = () => {
       message.success('Login successful')
       navigate(ROUTE.HOME)
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        message.error(error.response.data.message)
+      if (axios.isAxiosError(error)) {
+        console.log(error.message)
+        message.error(error.message)
+      } else if (error instanceof Error) {
+        message.error(error.message)
       } else {
-        message.error('An unexpected error occurred')
+        console.log('An unexpected error occurred')
       }
     }
   }
