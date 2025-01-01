@@ -1,5 +1,5 @@
 import message from 'antd/es/message'
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 
 import { ErrorType } from '@/types/error.type'
 import { LoginResponse, UserDTO, UserInformation } from '@/types/user.type'
@@ -11,7 +11,12 @@ export const login = async (data: UserDTO): Promise<LoginResponse> => {
     const response = await axiosClient.post<LoginResponse>('user/login', data)
     return response.data
   } catch (error) {
-    throw new Error(`Error while logging in: ${error}`)
+    if (axios.isAxiosError(error)) {
+      if (error.response && error.response.data) {
+        throw new AxiosError(error.response.data.detail)
+      }
+    }
+    throw new Error('Unexpected error occurred during login')
   }
 }
 
