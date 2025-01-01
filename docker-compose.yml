@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  study-planner-fe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: study-planner-fe
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - '9002:8080'
