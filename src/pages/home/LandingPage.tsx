@@ -119,6 +119,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonial Section */}
+      {/* Testimonials Section */}
       <section className='bg-white py-12'>
         <div className='container mx-auto text-center'>
           <h2 className='text-3xl font-bold mb-6'>What Our Users Say</h2>
@@ -131,41 +132,56 @@ const LandingPage: React.FC = () => {
             autoPlay={true}
             interval={5000}
           >
-            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
+            {/* Testimonial 1 */}
+            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
+              {/* Avatar */}
               <img
                 src={userTestimonial1Image}
                 alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
+                className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              <p className='text-gray-600 mb-2'>
-                &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
-                on!&quot;
-              </p>
-              <h4 className='font-bold text-lg'>- Alex M.</h4>
+              {/* Quote and Name */}
+              <div className='text-left'>
+                <p className='text-gray-600 mb-2'>
+                  &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
+                  on!&quot;
+                </p>
+                <h4 className='font-bold text-lg'>- Alex M.</h4>
+              </div>
             </div>
 
-            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
+            {/* Testimonial 2 */}
+            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
+              {/* Avatar */}
               <img
                 src={userTestimonial2Image}
                 alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
+                className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              <p className='text-gray-600 mb-2'>
-                &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
-              </p>
-              <h4 className='font-bold text-lg'>- Sarah L.</h4>
+              {/* Quote and Name */}
+              <div className='text-left'>
+                <p className='text-gray-600 mb-2'>
+                  &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
+                </p>
+                <h4 className='font-bold text-lg'>- Sarah L.</h4>
+              </div>
             </div>
 
-            <div className='p-6 bg-blue-50 shadow-md rounded-md'>
+            {/* Testimonial 3 */}
+            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
+              {/* Avatar */}
               <img
                 src={userTestimonial3Image}
                 alt='User Testimonial'
-                className='w-20 h-20 object-cover rounded-full mx-auto mb-4'
+                className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              <p className='text-gray-600 mb-2'>
-                &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
-              </p>
-              <h4 className='font-bold text-lg'>- Michael T.</h4>
+              {/* Quote and Name */}
+              <div className='text-left'>
+                <p className='text-gray-600 mb-2'>
+                  &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
+                </p>
+                <h4 className='font-bold text-lg'>- Michael T.</h4>
+              </div>
             </div>
           </Carousel>
         </div>
