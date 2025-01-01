@@ -38,7 +38,7 @@ const ResetPassword: React.FC = () => {
 
   const onSubmit = async (data: { newPassword: string }): Promise<void> => {
     try {
-      await axios.post('http://localhost:3000/user/reset-password', { token, ...data })
+      await axios.post(`${import.meta.env.VITE_API_URL}/user/reset-password`, { token, ...data })
       alert('Password has been reset successfully!')
     } catch {
       alert('Error resetting password')
