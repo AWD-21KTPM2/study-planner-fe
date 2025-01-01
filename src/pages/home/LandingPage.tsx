@@ -1,7 +1,7 @@
-import 'react-responsive-carousel/lib/styles/carousel.min.css'
+import 'react-multi-carousel/lib/styles.css'
 
 import React from 'react'
-import { Carousel } from 'react-responsive-carousel'
+import Carousel from 'react-multi-carousel'
 import { Link } from 'react-router-dom'
 
 import {
@@ -16,8 +16,28 @@ import {
   taskManagementImage,
   userTestimonial1Image,
   userTestimonial2Image,
-  userTestimonial3Image
+  userTestimonial3Image,
+  userTestimonial5Image
 } from '@/assets/images'
+
+const responsive = {
+  superLargeDesktop: {
+    breakpoint: { max: 4000, min: 1024 },
+    items: 3
+  },
+  desktop: {
+    breakpoint: { max: 1024, min: 768 },
+    items: 3
+  },
+  tablet: {
+    breakpoint: { max: 768, min: 464 },
+    items: 2
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1
+  }
+}
 
 const LandingPage: React.FC = () => {
   return (
@@ -125,22 +145,20 @@ const LandingPage: React.FC = () => {
           <h2 className='text-3xl font-bold mb-6'>What Our Users Say</h2>
 
           <Carousel
-            showArrows={true}
-            infiniteLoop={true}
-            showThumbs={false}
-            showStatus={false}
+            responsive={responsive}
+            infinite={true}
             autoPlay={true}
-            interval={5000}
+            autoPlaySpeed={3000}
+            keyBoardControl={true}
+            showDots={true}
+            arrows={true}
           >
-            {/* Testimonial 1 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
+            <div className='flex items-center p-6 rounded-md hover:shadow-lg transition-shadow'>
               <img
                 src={userTestimonial1Image}
                 alt='User Testimonial'
                 className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              {/* Quote and Name */}
               <div className='text-left'>
                 <p className='text-gray-600 mb-2'>
                   &quot;This planner has completely changed how I manage my study time. The AI suggestions are spot
@@ -150,15 +168,12 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Testimonial 2 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
+            <div className='flex items-center p-6 rounded-md hover:shadow-lg transition-shadow'>
               <img
                 src={userTestimonial2Image}
                 alt='User Testimonial'
                 className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              {/* Quote and Name */}
               <div className='text-left'>
                 <p className='text-gray-600 mb-2'>
                   &quot;The focus timer helps me stay productive, and the analytics keep me motivated to improve.&quot;
@@ -167,20 +182,30 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Testimonial 3 */}
-            <div className='flex items-center p-6 bg-blue-50 shadow-md rounded-md hover:shadow-lg transition-shadow'>
-              {/* Avatar */}
+            <div className='flex items-center p-6 rounded-md hover:shadow-lg transition-shadow'>
               <img
                 src={userTestimonial3Image}
                 alt='User Testimonial'
                 className='w-20 h-20 object-cover rounded-full mr-4'
               />
-              {/* Quote and Name */}
               <div className='text-left'>
                 <p className='text-gray-600 mb-2'>
                   &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend!&quot;
                 </p>
                 <h4 className='font-bold text-lg'>- Michael T.</h4>
+              </div>
+            </div>
+            <div className='flex items-center p-6 rounded-md hover:shadow-lg transition-shadow'>
+              <img
+                src={userTestimonial5Image}
+                alt='User Testimonial'
+                className='w-20 h-20 object-cover rounded-full mr-4'
+              />
+              <div className='text-left'>
+                <p className='text-gray-600 mb-2'>
+                  &quot;I love how easy it is to schedule tasks and track my progress. Highly recommend it!&quot;
+                </p>
+                <h4 className='font-bold text-lg'>- Michael TS.</h4>
               </div>
             </div>
           </Carousel>

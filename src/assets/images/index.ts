@@ -10,6 +10,7 @@ import step3Image from './use_ai_feedback.png'
 import userTestimonial2Image from './user2.jpg'
 import userTestimonial3Image from './user3.jpg'
 import userTestimonial1Image from './user4.jpg'
+import userTestimonial5Image from './user5.png'
 
 export {
   aiSuggestionsImage,
@@ -23,5 +24,6 @@ export {
   taskManagementImage,
   userTestimonial1Image,
   userTestimonial2Image,
-  userTestimonial3Image
+  userTestimonial3Image,
+  userTestimonial5Image
 }
