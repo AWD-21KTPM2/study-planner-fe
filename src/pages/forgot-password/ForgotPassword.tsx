@@ -35,7 +35,7 @@ const ForgotPassword: React.FC = () => {
 
   const onSubmit = async (data: { email: string }): Promise<void> => {
     try {
-      await axios.post('http://localhost:3000/user/forgot-password', data)
+      await axios.post(`${import.meta.env.VITE_API_URL}/user/forgot-password`, data)
       alert('Password reset email sent!')
     } catch {
       alert('Error sending password reset email')

@@ -16,7 +16,7 @@ const ActivationPage: React.FC = () => {
     setMessage('')
 
     try {
-      const response = await axios.post('http://localhost:3000/user/activate', { email, otp })
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/activate`, { email, otp })
       setMessage(response.data.message || 'Account activated successfully!')
       if (response.data.message.includes('successfully')) {
         setTimeout(() => {
