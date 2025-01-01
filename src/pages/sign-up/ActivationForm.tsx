@@ -1,9 +1,10 @@
 import axios from 'axios'
 import React, { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const ActivationPage: React.FC = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const email = location.state?.email || ''
 
   const [otp, setOtp] = useState<string>('')
@@ -17,6 +18,11 @@ const ActivationPage: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:3000/user/activate', { email, otp })
       setMessage(response.data.message || 'Account activated successfully!')
+      if (response.data.message.includes('successfully')) {
+        setTimeout(() => {
+          navigate('/login')
+        }, 1000)
+      }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         setMessage(error.response?.data?.message || 'Activation failed. Please try again.')

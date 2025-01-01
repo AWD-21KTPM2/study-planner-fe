@@ -90,6 +90,7 @@ const Login: React.FC = () => {
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         message.error(error.response.data.message)
+        // navigate(ROUTE.LOGIN)
       } else {
         message.error('An unexpected error occurred')
       }
