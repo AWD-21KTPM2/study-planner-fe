@@ -43,3 +43,14 @@ export const getUserProfile = async (accessToken: string | null): Promise<UserIn
     throw new Error(errorData)
   }
 }
+
+export const setProfileApi = async (data: UserInformation): Promise<UserInformation> => {
+  try {
+    const response = await axiosClient.put<UserInformation>('user/edit-profile', data)
+    return response.data
+  } catch (error) {
+    const errorData = (error as AxiosError<ErrorType>).response?.data.detail
+    message.error(errorData)
+    throw new Error(errorData)
+  }
+}
