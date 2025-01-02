@@ -1,7 +1,7 @@
 import { HomeOutlined, MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Avatar, Button, Card, Form, Input, Layout, message, Select, Spin, Typography } from 'antd'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FormItem } from 'react-hook-form-antd'
 import { useNavigate } from 'react-router-dom'
@@ -10,6 +10,9 @@ import * as zod from 'zod'
 import { ROUTE } from '@/constants/route.const'
 import { useProfile } from '@/hooks/useAuth'
 import { UserInformation } from '@/types/user.type'
+import { CountryData } from '@/types/other.type'
+import { getCountryDataApi } from '@/utils/apis/other-apis.util'
+import { setProfileApi } from '@/utils/apis/user-apis.util'
 
 const { Header, Content } = Layout
 const { Title, Text } = Typography
@@ -25,20 +28,37 @@ const profileSchema = zod.object({
 
 const Profile = (): React.ReactNode => {
   const { data: userInformation, isLoading } = useProfile()
+  const [countryList, setCountryList] = useState<CountryData[]>([])
   const navigate = useNavigate()
   const { reset, control, handleSubmit } = useForm<UserInformation>({
     resolver: zodResolver(profileSchema),
     defaultValues: userInformation
   })
 
+  const getCountryData = async (): Promise<void> => {
+    const data = await getCountryDataApi()
+    setCountryList(data)
+  }
+
+  useEffect(() => {
+    getCountryData()
+  }, [])
+
   useEffect(() => {
     // update default values
     reset(userInformation)
   }, [userInformation])
 
-  const onUpdateProfile = (): void => {
-    // setProfile(values)
-    message.info('Will be implemented soon')
+  const onUpdateProfile = async (): Promise<void> => {
+    const formValues = control._formValues
+    const updatedProfile: UserInformation = {
+      name: formValues.name,
+      phone: formValues.phone,
+      country: formValues.country,
+      bio: formValues.bio
+    }
+    await setProfileApi(updatedProfile)
+    message.success('Profile updated successfully')
   }
 
   return (
@@ -73,10 +93,11 @@ const Profile = (): React.ReactNode => {
             </FormItem>
             <FormItem control={control} name='country' label='Country'>
               <Select placeholder='eg. Thailand'>
-                <Option value='TH'>Thailand</Option>
-                <Option value='UK'>United Kingdom</Option>
-                <Option value='Canada'>Canada</Option>
-                <Option value='Australia'>Australia</Option>
+                {countryList.map((country) => (
+                  <Option key={country.code} value={country.code}>
+                    {country.name}
+                  </Option>
+                ))}
               </Select>
             </FormItem>
             <FormItem control={control} name='bio' label='Bio'>
