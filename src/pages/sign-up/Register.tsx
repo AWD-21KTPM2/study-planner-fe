@@ -102,7 +102,7 @@ const Register: React.FC = () => {
       navigate(ROUTE.ACTIVATE, { state: { email: data.email } })
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        message.error(error.response.data.message)
+        message.error(error.response.data.detail)
       } else {
         message.error('An unexpected error occurred')
       }
