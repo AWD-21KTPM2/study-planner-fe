@@ -19,6 +19,15 @@ export default defineConfig({
       interval: 1000
     }
   },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        // Filter out deprecation warnings related to Sass functions
+        if (warning.message.includes('deprecated')) return
+        warn(warning) // Log other warnings
+      }
+    }
+  },
   css: {
     preprocessorOptions: {
       scss: {
