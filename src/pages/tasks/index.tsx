@@ -26,7 +26,7 @@ const TaskPage: FC = () => {
   const filteredTasks = tasks?.filter((task) => {
     const matchesSearch =
       task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      task.description.toLowerCase().includes(searchQuery.toLowerCase())
+      (task.description?.toLowerCase() ?? '').includes(searchQuery.toLowerCase())
     const matchesStatus = filterStatus ? task.status === filterStatus : true
     const matchesPriority = filterPriority ? task.priority === filterPriority : true
     return matchesSearch && matchesStatus && matchesPriority
