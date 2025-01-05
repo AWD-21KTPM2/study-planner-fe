@@ -9,8 +9,6 @@ import App from '@/App'
 
 const queryClient = new QueryClient()
 
-console.log('import.meta.env', import.meta.env)
-
 createRoot(document.getElementById('root')!).render(
   <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <QueryClientProvider client={queryClient}>
