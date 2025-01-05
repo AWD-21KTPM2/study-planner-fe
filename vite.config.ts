@@ -11,13 +11,17 @@ const __dirname = path.dirname(__filename)
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true,
-    port: 8080,
+    host: '0.0.0.0',
+    port: parseInt(process.env.PORT || '8080', 10),
     hmr: true,
     watch: {
       usePolling: true,
       interval: 1000
     }
+  },
+  define: {
+    __API_URL__: JSON.stringify(process.env.VITE_API_URL),
+    __GOOGLE_CLIENT_ID__: JSON.stringify(process.env.VITE_GOOGLE_CLIENT_ID)
   },
   build: {
     rollupOptions: {
