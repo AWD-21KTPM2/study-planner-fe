@@ -169,6 +169,15 @@ const Login: React.FC = () => {
               Register
             </Link>
           </div>
+          <div className='text-center'>
+            <span className='text-gray-600'>Or </span>
+          </div>
+          <div className='text-center'>
+            <span className='text-gray-600'>Continue to explore as </span>
+            <Link href='/guest' className='text-blue-500 hover:underline'>
+              Guest
+            </Link>
+          </div>
         </Form>
       </div>
 
