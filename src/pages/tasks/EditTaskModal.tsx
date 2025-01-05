@@ -71,6 +71,34 @@ const statusTooltips = {
   [TaskStatus.EXPIRED]: 'Tasks that have passed their deadline'
 }
 
+interface ModalFooterProps {
+  onOk: () => void
+  onCancel: () => void
+  customActionLabel?: string
+  onCustomAction?: () => void
+}
+
+const ModalFooter: React.FC<ModalFooterProps> = ({ onOk, onCancel, customActionLabel, onCustomAction }) => {
+  return (
+    <div className='flex justify-between'>
+      {customActionLabel && (
+        <Button type='primary' onClick={onCustomAction} className='mr-2'>
+          {customActionLabel}
+        </Button>
+      )}
+
+      <div className='flex items-center gap-4'>
+        <Button onClick={onCancel} danger>
+          Cancel
+        </Button>
+        <Button type='primary' onClick={onOk}>
+          Save
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Element => {
   const { mutate: updateTask, isPending, reset: resetUpdateTask, isSuccess } = useUpdateTask()
   const { data: task } = useTask(taskId)
@@ -166,6 +194,14 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
       confirmLoading={isPending}
       destroyOnClose
       width={600}
+      footer={
+        <ModalFooter
+          onOk={handleSubmit(onSubmit)}
+          onCancel={handleCancel}
+          customActionLabel='Start Timer'
+          onCustomAction={handleStartTimer}
+        />
+      }
     >
       <Form layout='vertical' className='space-y-6'>
         <div className='space-y-4'>
@@ -241,11 +277,6 @@ const EditTaskModal = ({ isOpen, onClose, taskId }: EditTaskModalProps): JSX.Ele
           >
             <Select options={TaskStatusOptions} labelRender={taskStatusLabelRender} placeholder='Select task status' />
           </FormItem>
-
-          {/* Start Timer */}
-          <Button type='primary' onClick={handleStartTimer}>
-            Start Timer
-          </Button>
         </div>
       </Form>
     </Modal>
