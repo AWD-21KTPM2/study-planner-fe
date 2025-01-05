@@ -1,19 +1,16 @@
 import '@/pages/home/home.scss'
 
-import { BookOutlined, HomeOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
-import { Avatar, Dropdown, Layout, Menu, type MenuProps } from 'antd'
-import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { BookOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Dropdown, Layout, type MenuProps } from 'antd'
+import { Link, Outlet } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
 import { useAuth } from '@/hooks/useAuth'
 
 const { Header, Content } = Layout
 
-const menuList = [{ title: 'Home', icon: <HomeOutlined />, path: ROUTE.HOME }]
-
 const CommonLayout = (): React.ReactNode => {
   const { logout } = useAuth()
-  const navigate = useNavigate()
 
   const profileMenu: MenuProps['items'] = [
     {
@@ -33,12 +30,6 @@ const CommonLayout = (): React.ReactNode => {
       onClick: logout
     }
   ]
-  const menuItems = menuList.map((menu, index) => ({
-    key: index + 1,
-    icon: menu.icon,
-    label: menu.title,
-    onClick: (): void => navigate(menu.path)
-  }))
 
   return (
     <Layout className='min-h-screen'>
@@ -50,7 +41,6 @@ const CommonLayout = (): React.ReactNode => {
           </Link>
         </div>
         <div className='flex items-center gap-4'>
-          <Menu theme='light' mode='horizontal' defaultSelectedKeys={['1']} items={menuItems} />
           <Dropdown menu={{ items: profileMenu }} trigger={['click']}>
             <Avatar icon={<UserOutlined />} className='bg-blue-600 cursor-pointer' />
           </Dropdown>
