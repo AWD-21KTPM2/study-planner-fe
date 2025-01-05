@@ -23,6 +23,23 @@
 # ENTRYPOINT ["nginx", "-g", "daemon off;"] 
 
 # --- BUILD STAGE ---
+# FROM node:18-alpine AS build
+
+# WORKDIR /app
+
+# COPY package.json yarn.lock /app/
+# RUN yarn
+
+# COPY . /app/
+# RUN yarn build
+
+# CMD ["yarn", "dev", "--host", "0.0.0.0"]
+
+
+
+
+
+# --- BUILD STAGE ---
 FROM node:18-alpine AS build
 
 WORKDIR /app
@@ -33,6 +50,15 @@ RUN yarn
 COPY . /app/
 RUN yarn build
 
-CMD ["yarn", "dev", "--host", "0.0.0.0"]
+# --- RUN STAGE ---
+FROM node:18-alpine AS dev
+
+WORKDIR /app
+
+COPY --from=build /app /app
+
+EXPOSE 10000
+
+CMD ["yarn", "dev", "--host", "0.0.0.0", "--port", "$PORT"]
 
 
