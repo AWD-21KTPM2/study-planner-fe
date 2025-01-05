@@ -97,7 +97,8 @@ const Register: React.FC = () => {
   const onFinish = async (data: UserDTO): Promise<void> => {
     try {
       const response = await axios.post<{ message: string }>(`${import.meta.env.VITE_API_URL}/user/register`, data)
-      message.success(`${response.data.message}. Please check your email for the activation OTP.`)
+      console.log('response', response)
+      message.success(`Please check your email for the activation OTP.`)
       // navigate(ROUTE.ACTIVATE)
       navigate(ROUTE.ACTIVATE, { state: { email: data.email } })
     } catch (error) {
