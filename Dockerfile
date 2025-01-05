@@ -57,7 +57,7 @@ WORKDIR /app
 
 COPY --from=build /app /app
 
-EXPOSE 10000
+EXPOSE 8080
 
 CMD ["yarn", "dev", "--host", "0.0.0.0", "--port", "$PORT"]
 
