@@ -7,6 +7,8 @@ import { defineConfig } from 'vite'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+console.log(process.env.VITE_GOOGLE_CLIENT_ID)
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -18,6 +20,10 @@ export default defineConfig({
       usePolling: true,
       interval: 1000
     }
+  },
+  define: {
+    __API_URL__: JSON.stringify(process.env.VITE_API_URL),
+    __GOOGLE_CLIENT_ID__: JSON.stringify(process.env.VITE_GOOGLE_CLIENT_ID)
   },
   build: {
     rollupOptions: {
