@@ -1,6 +1,6 @@
 import axiosClient from '@/utils/axios-client.util'
 
-import { ResponseData } from './task-apis.util'
+import type { ResponseData } from './task-apis.util'
 
 export interface TimerProgressResponse {
   totalProductivity: string

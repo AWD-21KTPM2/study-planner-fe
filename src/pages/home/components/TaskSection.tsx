@@ -1,6 +1,6 @@
-import { FC } from 'react'
+import type { FC } from 'react'
 
-import { Task } from '@/types/task.type'
+import type { Task } from '@/types/task.type'
 
 import { TaskSectionHeader } from './TaskSectionHeader'
 

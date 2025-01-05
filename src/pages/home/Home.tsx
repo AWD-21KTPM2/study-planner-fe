@@ -1,20 +1,23 @@
 import '@/pages/home/home.scss'
 
-import { BarChartOutlined, CheckSquareOutlined, LoadingOutlined, RobotOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Collapse, CollapseProps, Empty, Row, Spin, Typography } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
+import { CheckSquareOutlined, LoadingOutlined, RobotOutlined } from '@ant-design/icons'
+import { useQuery } from '@tanstack/react-query'
+import { Button, Card, Col, Collapse, type CollapseProps, Empty, Row, Spin, Typography } from 'antd'
+import { useEffect, useRef, useState } from 'react'
 
 import DragAndDropCalendar from '@/components/calendar/DragAndDropCalendar'
 import { default as AiAnalyzeModal, default as GenerateFeedbackModal } from '@/components/modal/CommonModal'
 import { useTasks } from '@/hooks/useTasks'
-import { AnalyzeTaskDTO } from '@/types/ai-generate.type'
-import { IModalMethods } from '@/types/modal.type'
+import type { DataProps } from '@/pages/ai-generate/TaskAnalysisTable'
+import TaskAnalysisTable from '@/pages/ai-generate/TaskAnalysisTable'
+import UserProgress from '@/pages/user-progress/UserProgress'
+import type { AnalyzeTaskDTO } from '@/types/ai-generate.type'
+import type { IModalMethods } from '@/types/modal.type'
 import { analyzeTaskByAI, generateFeedback } from '@/utils/apis/ai-generate-apis.util'
-import { getTimeProgress, TimerProgressResponse } from '@/utils/apis/insights-apis.util'
+import type { TimerProgressResponse } from '@/utils/apis/insights-apis.util'
+import { getTimeProgress } from '@/utils/apis/insights-apis.util'
 import { formatAIGenerateFeedback } from '@/utils/common.util'
 
-import TaskAnalysisTable, { DataProps } from '../ai-generate/TaskAnalysisTable'
-import UserProgress from '../user-progress/UserProgress'
 import ActionCard from './ActionCard'
 import NewTaskModal from './NewTaskModal'
 import TaskList from './TaskList'
@@ -26,8 +29,17 @@ const Home = (): React.ReactNode => {
   const [isLoadingAnalyzes, setIsLoadingAnalyzes] = useState<boolean>(false)
   const [isLoadingFeedback, setIsLoadingFeedback] = useState<boolean>(false)
   const [isNewTaskOpen, setIsNewTaskOpen] = useState<boolean>(false)
-  const [userProgressData, setUserProgressData] = useState<TimerProgressResponse>()
-  const [userProgressLoading, setUserProgressLoading] = useState<boolean>(false)
+  const {
+    data: userProgressData,
+    isLoading: userProgressLoading,
+    refetch: fetchTimeProgress
+  } = useQuery({
+    queryKey: ['timeProgress'],
+    queryFn: async () => {
+      const response = await getTimeProgress()
+      return response.data
+    }
+  })
   const [generateFeedbackData, setGenerateFeedbackData] = useState<string>('')
 
   const { isLoading, data: tasks, error } = useTasks()
@@ -39,7 +51,7 @@ const Home = (): React.ReactNode => {
 
     const AIResponse: AnalyzeTaskDTO[] = await analyzeTaskByAI()
     const pipeAIResponse: DataProps[] = AIResponse.map(({ no: key, ...rest }) => ({ key, ...rest }) as DataProps)
-    setTaskAnalysis(pipeAIResponse as DataProps[])
+    setTaskAnalysis(pipeAIResponse)
     setIsLoadingAnalyzes(false)
   }
 
@@ -56,17 +68,6 @@ const Home = (): React.ReactNode => {
     setTaskAnalysis([])
   }
 
-  const fetchTimeProgress = async (): Promise<void> => {
-    setUserProgressLoading(true)
-    const response = await getTimeProgress()
-    setUserProgressData(response.data)
-    setUserProgressLoading(false)
-  }
-
-  useEffect(() => {
-    fetchTimeProgress()
-  }, [])
-
   const items: CollapseProps['items'] = [
     {
       key: '1',
@@ -74,14 +75,14 @@ const Home = (): React.ReactNode => {
         <div className='relative'>
           <b className='text-base'>Task Insights</b>
           <Button
-            className='absolute right-0'
+            className='right-0 absolute'
             onClick={(e) => {
               e.stopPropagation()
               fetchTimeProgress()
             }}
             style={{ top: '-20%' }}
           >
-            <i className='fa-solid fa-arrows-rotate'></i>
+            <i className='fa-arrows-rotate fa-solid' />
           </Button>
         </div>
       ),
@@ -98,7 +99,7 @@ const Home = (): React.ReactNode => {
       {isLoading && <Spin fullscreen />}
       {/* Quick Actions */}
       <Row gutter={[16, 16]} className='mb-6'>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='Add New Task'
             description='Create a study task'
@@ -109,16 +110,7 @@ const Home = (): React.ReactNode => {
             }}
           />
         </Col>
-        <Col xs={24} md={6}>
-          <ActionCard
-            title='View Progress'
-            description='Check your study progress'
-            className='bg-purple-50 hover:bg-purple-200 shadow-md'
-            icon={<BarChartOutlined className='text-2xl text-purple-600' />}
-            action={() => {}}
-          />
-        </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='Analyze Schedule'
             description='Analyze your study schedule with AI'
@@ -127,7 +119,7 @@ const Home = (): React.ReactNode => {
             action={analyzeTaskHandler}
           />
         </Col>
-        <Col xs={24} md={6}>
+        <Col xs={24} md={8}>
           <ActionCard
             title='AI feedback'
             description='Give feedback about my tasks'
@@ -144,7 +136,7 @@ const Home = (): React.ReactNode => {
       {/* Calendar and Tasks */}
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={18}>
-          <Card title='Schedule' extra={<Button type='link'>Analyze Schedule </Button>}>
+          <Card title='Schedule'>
             <div className='flex justify-center items-center rounded min-w-full --calendar-section'>
               <DragAndDropCalendar className='min-w-full' />
             </div>
@@ -194,7 +186,9 @@ const Home = (): React.ReactNode => {
             </div>
           ) : (
             <div
-              dangerouslySetInnerHTML={{ __html: formatAIGenerateFeedback(generateFeedbackData) }}
+              dangerouslySetInnerHTML={{
+                __html: formatAIGenerateFeedback(generateFeedbackData)
+              }}
               style={{ fontSize: 15 }}
             />
           )}

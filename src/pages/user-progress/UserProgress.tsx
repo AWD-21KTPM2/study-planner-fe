@@ -1,8 +1,8 @@
 import type { ProgressProps } from 'antd'
 import { Flex, Progress, Tag } from 'antd'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { TimerProgressResponse } from '@/utils/apis/insights-apis.util'
+import type { TimerProgressResponse } from '@/utils/apis/insights-apis.util'
 import { roundPercentForUserProgress } from '@/utils/common.util'
 
 const twoColors: ProgressProps['strokeColor'] = {
@@ -25,7 +25,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
 
   useEffect(() => {
     if (_dataSource) {
-      setTimeRate(parseFloat(_dataSource.totalProductivity))
+      setTimeRate(Number.parseFloat(_dataSource.totalProductivity))
       setTotalTasks(_dataSource.totalTasks)
       setCompletedTasks(_dataSource.countCompletedTasks)
       setInProgressTasks(_dataSource.countInProgressTasks)
@@ -50,7 +50,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
             percent={roundPercentForUserProgress(todoTasks, totalTasks)}
             format={() => `${todoTasks}/${totalTasks}`}
           />
-          <Tag color='default' className='text-base me-0 text-center'>
+          <Tag color='default' className='text-base text-center me-0'>
             To-do tasks
           </Tag>
         </Flex>
@@ -61,7 +61,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
             percent={roundPercentForUserProgress(inProgressTasks, totalTasks)}
             format={() => `${inProgressTasks}/${totalTasks}`}
           />
-          <Tag color='processing' className='text-base me-0 text-center'>
+          <Tag color='processing' className='text-base text-center me-0'>
             In-progress tasks
           </Tag>
         </Flex>
@@ -72,7 +72,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
             percent={roundPercentForUserProgress(completedTasks, totalTasks)}
             format={() => `${completedTasks}/${totalTasks}`}
           />
-          <Tag color='success' className='text-base me-0 text-center'>
+          <Tag color='success' className='text-base text-center me-0'>
             Completed tasks
           </Tag>
         </Flex>
@@ -83,7 +83,7 @@ const UserProgress: React.FC<IUserProgressProps> = ({ dataSource: _dataSource })
             percent={roundPercentForUserProgress(expiredTasks, totalTasks)}
             format={() => `${expiredTasks}/${totalTasks}`}
           />
-          <Tag color='error' className='text-base me-0 text-center'>
+          <Tag color='error' className='text-base text-center me-0'>
             Expired tasks
           </Tag>
         </Flex>
