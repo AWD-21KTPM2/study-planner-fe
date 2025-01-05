@@ -1,17 +1,7 @@
 import '@/pages/home/home.scss'
 
-import {
-  BookOutlined,
-  ContactsOutlined,
-  HomeOutlined,
-  InfoCircleOutlined,
-  LogoutOutlined,
-  SettingOutlined,
-  TeamOutlined,
-  UserOutlined
-} from '@ant-design/icons'
-import { Avatar, Dropdown, Layout, Menu, MenuProps } from 'antd'
-import React from 'react'
+import { BookOutlined, HomeOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Dropdown, Layout, Menu, type MenuProps } from 'antd'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 import { ROUTE } from '@/constants/route.const'
@@ -19,12 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 const { Header, Content } = Layout
 
-const menuList = [
-  { title: 'Home', icon: <HomeOutlined />, path: ROUTE.HOME },
-  { title: 'About', icon: <InfoCircleOutlined />, path: ROUTE.NOT_FOUND },
-  { title: 'Services', icon: <TeamOutlined />, path: ROUTE.NOT_FOUND },
-  { title: 'Contact', icon: <ContactsOutlined />, path: ROUTE.NOT_FOUND }
-]
+const menuList = [{ title: 'Home', icon: <HomeOutlined />, path: ROUTE.HOME }]
 
 const CommonLayout = (): React.ReactNode => {
   const { logout } = useAuth()

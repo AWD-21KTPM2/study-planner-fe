@@ -1,7 +1,6 @@
 import './task-analysis-table.scss'
 
 import { Table, Tag } from 'antd'
-import React from 'react'
 
 import { TaskPriority, TaskStatus } from '@/constants/task.const'
 

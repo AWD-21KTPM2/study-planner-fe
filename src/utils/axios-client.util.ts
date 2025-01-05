@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 import { ROUTE } from '@/constants/route.const'
-import { JwtRefreshDTO, UserInformation } from '@/types/user.type'
+import type { JwtRefreshDTO, UserInformation } from '@/types/user.type'
 
 import { refreshTokenApi } from './apis/auth-apis.util'
 
@@ -85,7 +85,7 @@ axiosClient.interceptors.response.use(
         )
 
         // Update the authorization header with the new token
-        originalRequest.headers['Authorization'] = `Bearer ${response.accessToken}`
+        originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
 
         // Retry the original request
         retryFlag = false

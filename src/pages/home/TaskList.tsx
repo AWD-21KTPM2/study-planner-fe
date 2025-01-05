@@ -1,7 +1,7 @@
-import { FC, useMemo } from 'react'
+import { type FC, useMemo } from 'react'
 
 import { TASK_LIST_DEFAULTS } from '@/constants/task.const'
-import { Task } from '@/types/task.type'
+import type { Task } from '@/types/task.type'
 
 import { TaskListRenderer } from './components/TaskListRenderer'
 import { TaskSection } from './components/TaskSection'
@@ -20,10 +20,10 @@ const TaskList: FC<TaskListProps> = ({ task_list, limit = TASK_LIST_DEFAULTS.DEF
     const scheduled: Task[] = []
     const unscheduled: Task[] = []
 
-    task_list.forEach((task) => {
+    for (const task of task_list) {
       if (task.startDate) scheduled.push(task)
       else unscheduled.push(task)
-    })
+    }
 
     return {
       scheduledTasks: scheduled.slice(0, limit),
